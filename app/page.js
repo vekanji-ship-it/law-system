@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-const CHECKOUT_URL = 'https://mookie-kanji.lemonsqueezy.com/checkout/buy/ee9d58aa-a6dd-4e9d-9b53-143b36f9de65'
+const CHECKOUT_URL = 'https://mookie-kanji.lemonsqueezy.com/checkout/buy/ee9d58aa-a6dd-4e9d-9b53-143b36f9de65?discount=EARLY30'
 
 export default function HomePage() {
   return (
