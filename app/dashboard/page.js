@@ -1,28 +1,40 @@
-import { createClient } from '../../lib/supabase-server'
-import { createClient as createAdminClient } from '@supabase/supabase-js'
-import { redirect } from 'next/navigation'
+'use client'
+import { useEffect, useState } from 'react'
+import { createClient } from '../../lib/supabase-client'
 import DashboardClient from '../../components/DashboardClient'
 
-export default async function DashboardPage() {
+export default function DashboardPage() {
+  const [user, setUser] = useState(null)
+  const [isPaid, setIsPaid] = useState(false)
+  const [loading, setLoading] = useState(true)
   const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
 
-  // 查詢此用戶是否有有效授權
-  const admin = createAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
+  useEffect(() => {
+    async function checkAuth() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        window.location.href = '/login'
+        return
+      }
+      setUser(user)
+      const { data: license } = await supabase
+        .from('licenses')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .maybeSingle()
+      setIsPaid(!!license)
+      setLoading(false)
+    }
+    checkAuth()
+  }, [])
+
+  if (loading) return (
+    <div style={{display:'flex',alignItems:'center',justifyContent:'center',
+      height:'100vh',background:'#0f1f3d',color:'white',fontSize:'18px'}}>
+      載入中...
+    </div>
   )
-  const { data: license } = await admin
-    .from('licenses')
-    .select('*')
-    .eq('user_id', user.id)
-    .eq('is_active', true)
-    .maybeSingle()
-
-  const isPaid = !!license
-  const plan = license?.plan || null
-  const expiresAt = license?.expires_at || null
-
-  return <DashboardClient user={user} isPaid={isPaid} plan={plan} expiresAt={expiresAt} />
+  if (!user) return null
+  return <DashboardClient user={user} isPaid={isPaid} plan={null} expiresAt={null} />
 }
