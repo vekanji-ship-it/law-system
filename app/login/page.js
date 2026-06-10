@@ -20,8 +20,7 @@ export default function LoginPage() {
     if (error) {
       setError('帳號或密碼錯誤，請再試一次')
     } else {
-      router.push('/dashboard')
-      router.refresh()
+      window.location.href = '/dashboard'
     }
     setLoading(false)
   }
