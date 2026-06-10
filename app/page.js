@@ -55,23 +55,23 @@ export default function HomePage() {
 
       {/* Pricing */}
       <div style={{ background: 'rgba(255,255,255,0.05)', borderTop: '1px solid rgba(255,255,255,0.1)', padding: '60px 20px' }}>
-        <h2 style={{ textAlign: 'center', color: 'white', fontSize: '32px', marginBottom: '40px' }}>方案選擇</h2>
-        <div style={{ maxWidth: '800px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+        <h2 style={{ textAlign: 'center', color: 'white', fontSize: '32px', marginBottom: '16px' }}>方案選擇</h2>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <span style={{ background: 'rgba(201,151,58,0.25)', border: '1px solid #c9973a', borderRadius: '20px', padding: '8px 20px', fontSize: '14px', color: '#e8b95a', fontWeight: 700 }}>
+            🎯 早鳥優惠：輸入折扣碼 <strong style={{color:'#fbbf24'}}>EARLY30</strong> 享 NT$399/月，限前30名
+          </span>
+        </div>
+        <div style={{ maxWidth: '600px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' }}>
           {[
             {
               name: '免費版', price: '0', unit: '永久免費',
-              features: ['基本案例瀏覽（部分）', '3道考古題', '2條法條解析'],
+              features: ['基本案例瀏覽（部分）', '3道考古題', '2條法條解析', 'AI問答 3次/天'],
               cta: '免費註冊', href: '/signup', gold: false, external: false
             },
             {
-              name: '月費版', price: '199', unit: '元 / 月',
-              features: ['全部19+案例', '完整考古題庫', '全法條解析', '所有SOP流程', '優先客服'],
+              name: '月費版', price: '799', unit: '元 / 月',
+              features: ['全部19+案例', '完整考古題庫', '全法條解析', '所有SOP流程', '🤖 AI問答無限次', '優先客服'],
               cta: '💳 立即訂閱', href: CHECKOUT_URL, gold: true, external: true
-            },
-            {
-              name: '年費版', price: '1,990', unit: '元 / 年（省$398）',
-              features: ['月費版全部功能', '年繳優惠', '新內容優先解鎖'],
-              cta: '年費最優惠', href: CHECKOUT_URL, gold: false, external: true
             },
           ].map((p, i) => (
             <div key={i} style={{ background: p.gold ? 'linear-gradient(135deg, #c9973a, #e8b95a)' : 'rgba(255,255,255,0.08)', borderRadius: '16px', padding: '32px', border: p.gold ? 'none' : '1px solid rgba(255,255,255,0.15)', transform: p.gold ? 'scale(1.05)' : 'none' }}>
