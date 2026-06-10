@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { CASES, EXAM_QUESTIONS, LAW_ARTICLES, SOPS } from '../lib/data'
 import Link from 'next/link'
 
+const CHECKOUT_URL = 'https://mookie-kanji.lemonsqueezy.com/checkout/buy/ee9d58aa-a6dd-4e9d-9b53-143b36f9de65'
+
 export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
   const [tab, setTab] = useState('cases')
   const [caseCategory, setCaseCategory] = useState('全部')
@@ -15,8 +17,7 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    router.push('/')
-    router.refresh()
+    window.location.href = '/'
   }
 
   const toggle = (id) => setExpandedId(expandedId === id ? null : id)
@@ -39,7 +40,7 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
       <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '8px', color: '#0f1f3d' }}>付費會員限定內容</h3>
       <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '20px' }}>解鎖全部案例、考古題庫、法條解析和SOP流程</p>
       <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <a href="https://your-lemonsqueezy-link.com" target="_blank" className="btn btn-gold">💳 NT$199/月 立即訂閱</a>
+        <a href={CHECKOUT_URL} target="_blank" rel="noopener noreferrer" className="btn btn-gold">💳 NT$199/月 立即訂閱</a>
         <Link href="/activate" className="btn btn-outline">🔑 已有授權碼？點此輸入</Link>
       </div>
     </div>
@@ -59,7 +60,7 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
                 ✓ {plan === 'yearly' ? '年費版' : '月費版'} 已啟用
               </span>
             ) : (
-              <a href="https://your-lemonsqueezy-link.com" target="_blank" className="btn btn-gold btn-sm">💳 升級付費版</a>
+              <a href={CHECKOUT_URL} target="_blank" rel="noopener noreferrer" className="btn btn-gold btn-sm">💳 升級付費版</a>
             )}
             <button onClick={handleLogout} className="btn btn-sm" style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)', fontSize: '13px' }}>登出</button>
           </div>
@@ -69,7 +70,7 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
       {/* User info bar */}
       {!isPaid && (
         <div style={{ background: '#fff8e1', borderBottom: '1px solid #fbbf24', padding: '10px 24px', textAlign: 'center', fontSize: '13px', color: '#92400e' }}>
-          🔑 您目前使用<strong>免費版</strong>，<Link href="/activate" style={{ color: '#0f1f3d', fontWeight: 700 }}>輸入授權碼</Link> 或 <a href="https://your-lemonsqueezy-link.com" target="_blank" style={{ color: '#0f1f3d', fontWeight: 700 }}>付費訂閱</a> 解鎖所有內容
+          🔑 您目前使用<strong>免費版</strong>，<Link href="/activate" style={{ color: '#0f1f3d', fontWeight: 700 }}>輸入授權碼</Link> 或 <a href={CHECKOUT_URL} target="_blank" rel="noopener noreferrer" style={{ color: '#0f1f3d', fontWeight: 700 }}>付費訂閱</a> 解鎖所有內容
         </div>
       )}
 
@@ -112,7 +113,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
                     </div>
                     <span style={{ color: '#94a3b8', fontSize: '20px', flexShrink: 0 }}>{expandedId === c.id ? '▲' : '▼'}</span>
                   </div>
-
                   {expandedId === c.id && (
                     c.isPaid && !isPaid ? <LockWall /> : (
                       <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
@@ -168,7 +168,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
                     </div>
                     <span style={{ color: '#94a3b8', fontSize: '20px', flexShrink: 0 }}>{expandedId === q.id ? '▲' : '▼'}</span>
                   </div>
-
                   {expandedId === q.id && (
                     q.isPaid && !isPaid ? <LockWall /> : (
                       <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e2e8f0' }}>
@@ -211,7 +210,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
                   </div>
                   <span style={{ color: '#94a3b8', fontSize: '20px', flexShrink: 0 }}>{expandedId === l.id ? '▲' : '▼'}</span>
                 </div>
-
                 {expandedId === l.id && (
                   l.isPaid && !isPaid ? <LockWall /> : (
                     <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e2e8f0' }}>
@@ -246,7 +244,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
                   </div>
                   <span style={{ color: '#94a3b8', fontSize: '20px', flexShrink: 0 }}>{expandedId === s.id ? '▲' : '▼'}</span>
                 </div>
-
                 {expandedId === s.id && (
                   s.isPaid && !isPaid ? <LockWall /> : (
                     <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
