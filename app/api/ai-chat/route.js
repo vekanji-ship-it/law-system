@@ -1,3 +1,4 @@
+// app/api/ai-chat/route.js
 import Anthropic from '@anthropic-ai/sdk'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
@@ -40,7 +41,7 @@ export async function POST(request) {
     }
 
     const response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',   // ✅ 修正：正確的 model 名稱
       max_tokens: 1500,
       system: SYSTEM_PROMPT,
       messages: messages.map(m => ({
@@ -55,7 +56,18 @@ export async function POST(request) {
     })
 
   } catch (error) {
-    console.error('AI chat error:', error)
+    console.error('AI chat error:', error?.status, error?.message)
+
+    if (error?.status === 401) {
+      return Response.json({ error: 'API 金鑰無效，請聯繫管理員' }, { status: 500 })
+    }
+    if (error?.status === 400 || error?.status === 404) {
+      return Response.json({ error: `API 參數錯誤：${error.message}` }, { status: 500 })
+    }
+    if (error?.status === 429) {
+      return Response.json({ error: '請求太頻繁，請稍後再試' }, { status: 429 })
+    }
+
     return Response.json({ error: '服務暫時不可用，請稍後再試' }, { status: 500 })
   }
 }
