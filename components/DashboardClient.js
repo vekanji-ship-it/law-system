@@ -1,7 +1,8 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
 import { createClient } from '../lib/supabase-client'
-import { CASES, EXAM_QUESTIONS, LAW_ARTICLES, SOPS } from '../lib/data'
+import { CASES, EXAM_QUESTIONS, SOPS } from '../lib/data'
+import LawSection from './LawSection'
 import Link from 'next/link'
 
 const CHECKOUT_MONTHLY = '/checkout'
@@ -14,7 +15,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
   const [expandedId, setExpandedId] = useState(null)
   const supabase = createClient()
 
-  // AI 問答狀態
   const [messages, setMessages] = useState([])
   const [inputText, setInputText] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
@@ -44,13 +44,11 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
   const handleSendMessage = async () => {
     if (!inputText.trim() || aiLoading) return
     setAiError('')
-
     const userMessage = { role: 'user', content: inputText.trim() }
     const newMessages = [...messages, userMessage]
     setMessages(newMessages)
     setInputText('')
     setAiLoading(true)
-
     try {
       const res = await fetch('/api/ai-chat', {
         method: 'POST',
@@ -58,25 +56,15 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
         body: JSON.stringify({ messages: newMessages, isPaid })
       })
       const data = await res.json()
-
-      if (data.error === 'FREE_LIMIT') {
-        setAiError(data.message)
-      } else if (data.error) {
-        setAiError(data.error)
-      } else {
-        setMessages([...newMessages, { role: 'assistant', content: data.content }])
-      }
-    } catch (e) {
-      setAiError('網路錯誤，請稍後再試')
-    }
+      if (data.error === 'FREE_LIMIT') setAiError(data.message)
+      else if (data.error) setAiError(data.error)
+      else setMessages([...newMessages, { role: 'assistant', content: data.content }])
+    } catch (e) { setAiError('網路錯誤，請稍後再試') }
     setAiLoading(false)
   }
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSendMessage()
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage() }
   }
 
   const SUGGESTED_QUESTIONS = [
@@ -97,9 +85,9 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
     <div style={{ background: '#fef9ec', border: '2px dashed #fbbf24', borderRadius: '12px', padding: '32px', textAlign: 'center', marginTop: '12px' }}>
       <div style={{ fontSize: '36px', marginBottom: '12px' }}>🔒</div>
       <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '8px', color: '#0f1f3d' }}>付費會員限定內容</h3>
-      <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '20px' }}>解鎖全部案例、考古題庫、法條解析、SOP流程和 AI 無限問答</p>
+      <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '20px' }}>解鎖全部案例、321條法條、考古題庫、SOP流程和 AI 無限問答</p>
       <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <a href={CHECKOUT_MONTHLY} target="_blank" rel="noopener noreferrer" className="btn btn-gold">💳 NT$699/月 立即訂閱</a>
+        <a href={CHECKOUT_MONTHLY} className="btn btn-gold">💳 NT$799/月 立即訂閱</a>
         <Link href="/activate" className="btn btn-outline">🔑 已有授權碼？點此輸入</Link>
       </div>
     </div>
@@ -107,7 +95,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
 
   return (
     <div style={{ minHeight: '100vh', background: '#faf8f3' }}>
-      {/* Header */}
       <div style={{ background: '#0f1f3d', padding: '0 24px' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '60px' }}>
           <div style={{ color: 'white', fontWeight: 900, fontSize: '18px' }}>
@@ -119,27 +106,25 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
                 ✓ {plan === 'yearly' ? '年費版' : '月費版'} 已啟用
               </span>
             ) : (
-              <a href={CHECKOUT_MONTHLY} target="_blank" rel="noopener noreferrer" className="btn btn-gold btn-sm">💳 升級付費版</a>
+              <a href={CHECKOUT_MONTHLY} className="btn btn-gold btn-sm">💳 升級付費版</a>
             )}
             <button onClick={handleLogout} className="btn btn-sm" style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)', fontSize: '13px' }}>登出</button>
           </div>
         </div>
       </div>
 
-      {/* Info bar */}
       {!isPaid && (
         <div style={{ background: '#fff8e1', borderBottom: '1px solid #fbbf24', padding: '10px 24px', textAlign: 'center', fontSize: '13px', color: '#92400e' }}>
-          🔑 免費版：<Link href="/activate" style={{ color: '#0f1f3d', fontWeight: 700 }}>輸入授權碼</Link> 或 <a href={CHECKOUT_MONTHLY} target="_blank" rel="noopener noreferrer" style={{ color: '#0f1f3d', fontWeight: 700 }}>升級付費版</a> 解鎖所有內容 + AI 無限問答
+          🔑 免費版：<Link href="/activate" style={{ color: '#0f1f3d', fontWeight: 700 }}>輸入授權碼</Link> 或 <a href={CHECKOUT_MONTHLY} style={{ color: '#0f1f3d', fontWeight: 700 }}>升級付費版</a> 解鎖321條法條 + AI無限問答
         </div>
       )}
 
       <div className="page-container">
-        {/* Tabs */}
         <div className="tab-bar">
           {[
             { id: 'cases', label: '📂 案例庫', count: CASES.length },
             { id: 'exams', label: '📝 考古題庫', count: EXAM_QUESTIONS.length },
-            { id: 'laws', label: '⚖️ 法條解析', count: LAW_ARTICLES.length },
+            { id: 'laws', label: '⚖️ 法條解析', count: 321 },
             { id: 'sops', label: '📋 實務SOP', count: SOPS.length },
             { id: 'ai', label: '🤖 AI問答', count: null },
           ].map(t => (
@@ -155,31 +140,25 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
         {/* ── AI 問答 ── */}
         {tab === 'ai' && (
           <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-            {/* AI 標題 */}
             <div style={{ background: 'linear-gradient(135deg, #0f1f3d, #1a3260)', borderRadius: '16px', padding: '24px', marginBottom: '20px', color: 'white', textAlign: 'center' }}>
               <div style={{ fontSize: '40px', marginBottom: '8px' }}>🤖</div>
               <h2 style={{ fontSize: '20px', fontWeight: 900, marginBottom: '6px' }}>地政同根生 AI 顧問</h2>
-              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px' }}>
-                專業回答地政士與房仲的法律、稅務、登記實務問題
-              </p>
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px' }}>專業回答地政士與房仲的法律、稅務、登記實務問題</p>
               {!isPaid && (
                 <div style={{ marginTop: '12px', background: 'rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px 16px', fontSize: '13px' }}>
                   免費版剩餘問答：<strong style={{ color: '#fbbf24' }}>{Math.max(0, freeLimit - freeQuestions)} / {freeLimit}</strong> 次
-                  　｜　<a href={CHECKOUT_MONTHLY} target="_blank" rel="noopener noreferrer" style={{ color: '#fbbf24', fontWeight: 700 }}>升級無限制</a>
+                  　｜　<a href={CHECKOUT_MONTHLY} style={{ color: '#fbbf24', fontWeight: 700 }}>升級無限制</a>
                 </div>
               )}
             </div>
 
-            {/* 建議問題 */}
             {messages.length === 0 && (
               <div style={{ marginBottom: '20px' }}>
                 <div style={{ fontSize: '13px', fontWeight: 700, color: '#64748b', marginBottom: '10px' }}>💡 常見問題範例（點擊快速提問）</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {SUGGESTED_QUESTIONS.map((q, i) => (
                     <button key={i} onClick={() => setInputText(q)}
-                      style={{ textAlign: 'left', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px 14px', fontSize: '14px', color: '#374151', cursor: 'pointer', transition: 'all 0.2s' }}
-                      onMouseOver={e => e.target.style.borderColor = '#0f1f3d'}
-                      onMouseOut={e => e.target.style.borderColor = '#e2e8f0'}>
+                      style={{ textAlign: 'left', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px 14px', fontSize: '14px', color: '#374151', cursor: 'pointer' }}>
                       {q}
                     </button>
                   ))}
@@ -187,7 +166,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
               </div>
             )}
 
-            {/* 對話區 */}
             {messages.length > 0 && (
               <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '20px', marginBottom: '16px', maxHeight: '500px', overflowY: 'auto' }}>
                 {messages.map((m, i) => (
@@ -203,38 +181,28 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
                 {aiLoading && (
                   <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                     <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#c9973a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🤖</div>
-                    <div style={{ background: '#faf8f3', borderRadius: '4px 12px 12px 12px', padding: '12px 16px', fontSize: '14px', color: '#64748b' }}>
-                      AI 顧問思考中<span style={{ animation: 'blink 1s infinite' }}>...</span>
-                    </div>
+                    <div style={{ background: '#faf8f3', borderRadius: '4px 12px 12px 12px', padding: '12px 16px', fontSize: '14px', color: '#64748b' }}>AI 顧問思考中...</div>
                   </div>
                 )}
                 <div ref={chatEndRef} />
               </div>
             )}
 
-            {/* 錯誤提示 */}
             {aiError && (
               <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '12px 16px', marginBottom: '12px', fontSize: '14px', color: '#dc2626' }}>
                 ⚠️ {aiError}
-                {aiError.includes('升級') && (
-                  <a href={CHECKOUT_MONTHLY} target="_blank" rel="noopener noreferrer" style={{ marginLeft: '8px', fontWeight: 700, color: '#0f1f3d' }}>立即升級 →</a>
-                )}
+                {aiError.includes('升級') && <a href={CHECKOUT_MONTHLY} style={{ marginLeft: '8px', fontWeight: 700, color: '#0f1f3d' }}>立即升級 →</a>}
               </div>
             )}
 
-            {/* 輸入區 */}
             <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '12px', display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
-              <textarea
-                value={inputText}
-                onChange={e => setInputText(e.target.value)}
-                onKeyDown={handleKeyDown}
+              <textarea value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={handleKeyDown}
                 placeholder="輸入你的地政或不動產問題...（Enter 送出，Shift+Enter 換行）"
                 disabled={!isPaid && freeQuestions >= freeLimit}
                 style={{ flex: 1, border: 'none', outline: 'none', resize: 'none', fontSize: '14px', lineHeight: 1.6, minHeight: '48px', maxHeight: '120px', fontFamily: 'inherit', color: '#1a1a2e', background: 'transparent' }}
-                rows={2}
-              />
+                rows={2} />
               <button onClick={handleSendMessage} disabled={!inputText.trim() || aiLoading || (!isPaid && freeQuestions >= freeLimit)}
-                style={{ flexShrink: 0, width: '44px', height: '44px', background: (!inputText.trim() || aiLoading) ? '#e2e8f0' : '#0f1f3d', color: 'white', border: 'none', borderRadius: '10px', fontSize: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>
+                style={{ flexShrink: 0, width: '44px', height: '44px', background: (!inputText.trim() || aiLoading) ? '#e2e8f0' : '#0f1f3d', color: 'white', border: 'none', borderRadius: '10px', fontSize: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {aiLoading ? '⏳' : '➤'}
               </button>
             </div>
@@ -245,10 +213,7 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
                 🗑 清除對話，重新開始
               </button>
             )}
-
-            <p style={{ marginTop: '12px', fontSize: '12px', color: '#94a3b8', textAlign: 'center' }}>
-              AI 回答僅供參考，具體個案建議諮詢持照地政士或律師
-            </p>
+            <p style={{ marginTop: '12px', fontSize: '12px', color: '#94a3b8', textAlign: 'center' }}>AI 回答僅供參考，具體個案建議諮詢持照地政士或律師</p>
           </div>
         )}
 
@@ -351,41 +316,8 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
           </div>
         )}
 
-        {/* ── 法條解析 ── */}
-        {tab === 'laws' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {LAW_ARTICLES.map(l => (
-              <div key={l.id} className="card">
-                <div onClick={() => toggle(l.id)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                      <span className="badge badge-navy">{l.lawName}</span>
-                      <span className="badge" style={{ background: '#f0f4ff', color: '#1e40af' }}>{l.article}</span>
-                      <PaidBadge isPaidContent={l.isPaid} />
-                    </div>
-                    <h3 style={{ fontSize: '16px', fontWeight: 700 }}>{l.title}</h3>
-                  </div>
-                  <span style={{ color: '#94a3b8', fontSize: '20px', flexShrink: 0 }}>{expandedId === l.id ? '▲' : '▼'}</span>
-                </div>
-                {expandedId === l.id && (
-                  l.isPaid && !isPaid ? <LockWall /> : (
-                    <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e2e8f0' }}>
-                      <div style={{ background: '#f8fafc', borderRadius: '8px', padding: '16px', marginBottom: '16px', fontFamily: 'monospace', fontSize: '13px', lineHeight: 1.8, color: '#374151', whiteSpace: 'pre-wrap', borderLeft: '4px solid #0f1f3d' }}>{l.fullText}</div>
-                      <div style={{ background: '#f0fdf4', borderRadius: '8px', padding: '16px', marginBottom: '12px' }}>
-                        <div style={{ fontWeight: 700, color: '#16a34a', marginBottom: '8px', fontSize: '13px' }}>🔍 重點解析</div>
-                        <div style={{ fontSize: '14px', color: '#374151', lineHeight: 1.8, whiteSpace: 'pre-line' }}>{l.analysis}</div>
-                      </div>
-                      <div style={{ background: '#fef9ec', borderRadius: '8px', padding: '16px' }}>
-                        <div style={{ fontWeight: 700, color: '#d97706', marginBottom: '8px', fontSize: '13px' }}>📌 實務應用範例</div>
-                        <div style={{ fontSize: '14px', color: '#374151', lineHeight: 1.7 }}>{l.practicalExample}</div>
-                      </div>
-                    </div>
-                  )
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+        {/* ── 法條解析（321條完整版）── */}
+        {tab === 'laws' && <LawSection isPaid={isPaid} />}
 
         {/* ── 實務SOP ── */}
         {tab === 'sops' && (
