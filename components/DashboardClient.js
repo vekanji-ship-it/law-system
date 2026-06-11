@@ -4,8 +4,8 @@ import { createClient } from '../lib/supabase-client'
 import { CASES, EXAM_QUESTIONS, LAW_ARTICLES, SOPS } from '../lib/data'
 import Link from 'next/link'
 
-const CHECKOUT_MONTHLY = 'https://mookie-kanji.lemonsqueezy.com/checkout/buy/ee9d58aa-a6dd-4e9d-9b53-143b36f9de65?discount=EARLY30'
-const CHECKOUT_YEARLY = 'https://mookie-kanji.lemonsqueezy.com/checkout/buy/ee9d58aa-a6dd-4e9d-9b53-143b36f9de65?discount=EARLY30'
+const CHECKOUT_MONTHLY = '/checkout'
+const CHECKOUT_YEARLY = '/checkout'
 
 export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
   const [tab, setTab] = useState('cases')
