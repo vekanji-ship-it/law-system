@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { LAW_CATEGORIES, FULL_LAW_ARTICLES } from '../lib/full-law-data'
+import { SUPPLEMENT_LAW_ARTICLES_1 } from '../lib/supplement-law-data-1'
 import Link from 'next/link'
 
 const CHECKOUT_URL = 'https://mookie-kanji.lemonsqueezy.com/checkout/buy/ee9d58aa-a6dd-4e9d-9b53-143b36f9de65?discount=EARLY30'
