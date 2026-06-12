@@ -126,7 +126,7 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
           {[
             { id: 'cases', label: '📂 案例庫', count: CASES.length },
             { id: 'exams', label: '📝 考古題庫', count: EXAM_QUESTIONS.length },
-            { id: 'laws', label: '⚖️ 法條解析', count: 321 },
+            { id: 'laws', label: '⚖️ 法條解析', count: allArticles.length },
             { id: 'sops', label: '📋 實務SOP', count: SOPS.length },
             { id: 'real_cases', label: '🏠 實務案例庫', count: 19 },
             { id: 'exam_appendix', label: '📅 考古題附錄', count: 38 },
@@ -320,7 +320,7 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
           </div>
         )}
 
-        {/* ── 法條解析（321條完整版）── */}
+        {/* ── 法條解析（完整版）── */}
         {tab === 'laws' && <LawSection isPaid={isPaid} />}
 
         {/* ── 實務SOP ── */}
