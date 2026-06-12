@@ -1,4 +1,6 @@
 'use client'
+import { FULL_LAW_ARTICLES } from '../lib/full-law-data'
+import { SUPPLEMENT_LAW_ARTICLES_1 } from '../lib/supplement-law-data-1'
 import { useState, useRef, useEffect } from 'react'
 import { createClient } from '../lib/supabase-client'
 import { CASES, EXAM_QUESTIONS, SOPS } from '../lib/data'
