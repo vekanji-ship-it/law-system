@@ -15,7 +15,8 @@ export default function LawSection({ isPaid }) {
   const toggle = (id) => setExpandedId(expandedId === id ? null : id)
 
   // Filter
-  const filtered = FULL_LAW_ARTICLES.filter(l => {
+  const allArticles = [...FULL_LAW_ARTICLES, ...SUPPLEMENT_LAW_ARTICLES_1]
+  const filtered = allArticles.filter(l => {
     const matchCat = selectedCat === '全部' || l.catCode === selectedCat
     const matchFreq = showFreq === '全部' || l.freq === showFreq
     const matchSearch = !searchText || 
@@ -75,7 +76,7 @@ export default function LawSection({ isPaid }) {
       <div style={{ display: 'flex', gap: '6px', marginBottom: '10px', flexWrap: 'wrap' }}>
         {['全部', ...LAW_CATEGORIES.map(c => c.id)].map(cat => {
           const label = cat === '全部' ? '全部' : LAW_CATEGORIES.find(c => c.id === cat)?.label?.split('.')[0] + '.'
-          const count = cat === '全部' ? filtered.length : FULL_LAW_ARTICLES.filter(l => l.catCode === cat).length
+          const count = cat === '全部' ? filtered.length : allArticles.filter(l => l.catCode === cat).length
           return (
             <button key={cat} onClick={() => setSelectedCat(cat)}
               style={{ padding: '5px 12px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 600,
