@@ -15,7 +15,6 @@ export default function LawSection({ isPaid }) {
 
   const toggle = (id) => setExpandedId(expandedId === id ? null : id)
 
-  const allArticles = [...FULL_LAW_ARTICLES, ...SUPPLEMENT_LAW_ARTICLES_1]
   const allArticles = [...FULL_LAW_ARTICLES, ...SUPPLEMENT_LAW_ARTICLES_1, ...SUPPLEMENT_LAW_ARTICLES_2]
 
   const filtered = allArticles.filter(l => {
