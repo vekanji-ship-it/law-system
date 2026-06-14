@@ -1,6 +1,7 @@
 'use client'
 import { FULL_LAW_ARTICLES } from '../lib/full-law-data'
 import { SUPPLEMENT_LAW_ARTICLES_1 } from '../lib/supplement-law-data-1'
+import { SUPPLEMENT_LAW_ARTICLES_2 } from '../lib/supplement-law-data-2'
 import { useState, useRef, useEffect } from 'react'
 import { createClient } from '../lib/supabase-client'
 import { CASES, EXAM_QUESTIONS, SOPS } from '../lib/data'
@@ -13,7 +14,7 @@ const CHECKOUT_MONTHLY = '/checkout'
 const CHECKOUT_YEARLY = '/checkout'
 
 export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
-  const totalLaws = FULL_LAW_ARTICLES.length + SUPPLEMENT_LAW_ARTICLES_1.length
+  const totalLaws = FULL_LAW_ARTICLES.length + SUPPLEMENT_LAW_ARTICLES_1.length + SUPPLEMENT_LAW_ARTICLES_2.length
   const [tab, setTab] = useState('cases')
   const [caseCategory, setCaseCategory] = useState('全部')
   const [examCategory, setExamCategory] = useState('全部')
