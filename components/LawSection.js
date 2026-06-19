@@ -4,6 +4,7 @@ import { LAW_CATEGORIES, FULL_LAW_ARTICLES } from '../lib/full-law-data'
 import { SUPPLEMENT_LAW_ARTICLES_1 } from '../lib/supplement-law-data-1'
 import { SUPPLEMENT_LAW_ARTICLES_2 } from '../lib/supplement-law-data-2'
 import { SUPPLEMENT_LAW_ARTICLES_3 } from '../lib/supplement-law-data-3'
+import { SUPPLEMENT_LAW_ARTICLES_4 } from '../lib/supplement-law-data-4'
 import Link from 'next/link'
 
 const CHECKOUT_URL = '/checkout'
@@ -16,7 +17,7 @@ export default function LawSection({ isPaid }) {
 
   const toggle = (id) => setExpandedId(expandedId === id ? null : id)
 
-  const allArticles = [...FULL_LAW_ARTICLES, ...SUPPLEMENT_LAW_ARTICLES_1, ...SUPPLEMENT_LAW_ARTICLES_2, ...SUPPLEMENT_LAW_ARTICLES_3]
+  const allArticles = [...FULL_LAW_ARTICLES, ...SUPPLEMENT_LAW_ARTICLES_1, ...SUPPLEMENT_LAW_ARTICLES_2, ...SUPPLEMENT_LAW_ARTICLES_3, ...SUPPLEMENT_LAW_ARTICLES_4]
 
   const filtered = allArticles.filter(l => {
     const matchCat = selectedCat === '全部' || l.catCode === selectedCat
