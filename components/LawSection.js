@@ -5,7 +5,7 @@ import { SUPPLEMENT_LAW_ARTICLES_1 } from '../lib/supplement-law-data-1'
 import { SUPPLEMENT_LAW_ARTICLES_2 } from '../lib/supplement-law-data-2'
 import { SUPPLEMENT_LAW_ARTICLES_3 } from '../lib/supplement-law-data-3'
 import { SUPPLEMENT_LAW_ARTICLES_4 } from '../lib/supplement-law-data-4'
-import { SUPPLEMENT_LAW_ARTICLES_4 } from '../lib/supplement-law-data-5'
+import { SUPPLEMENT_LAW_ARTICLES_5 } from '../lib/supplement-law-data-5'
 import Link from 'next/link'
 
 const CHECKOUT_URL = '/checkout'
