@@ -81,7 +81,7 @@ export default function LawSection({ isPaid }) {
       {/* Category filter */}
       <div style={{ display: 'flex', gap: '6px', marginBottom: '10px', flexWrap: 'wrap' }}>
         {['全部', ...LAW_CATEGORIES.map(c => c.id)].map(cat => {
-          const label = cat === '全部' ? '全部' : LAW_CATEGORIES.find(c => c.id === cat)?.label?.split('.')[0] + '.'
+          const label = cat === '全部' ? '全部' : LAW_CATEGORIES.find(c => c.id === cat)?.label?.split('. ')[1] || cat
           const count = cat === '全部' ? filtered.length : allArticles.filter(l => l.catCode === cat).length
           return (
             <button key={cat} onClick={() => setSelectedCat(cat)}
