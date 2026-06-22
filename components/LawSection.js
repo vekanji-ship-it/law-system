@@ -12,6 +12,7 @@ import { SUPPLEMENT_LAW_ARTICLES_8 } from '../lib/supplement-law-data-8'
 import { SUPPLEMENT_LAW_ARTICLES_9 } from '../lib/supplement-law-data-9'
 import { SUPPLEMENT_LAW_ARTICLES_10 } from '../lib/supplement-law-data-10'
 import { SUPPLEMENT_LAW_ARTICLES_11 } from '../lib/supplement-law-data-11'
+import { SUPPLEMENT_LAW_ARTICLES_12 } from '../lib/supplement-law-data-12'
 import LawHeatmap from './LawHeatmap'
 import LawRelationMap from './LawRelationMap'
 import Link from 'next/link'
@@ -68,6 +69,7 @@ export default function LawSection({ isPaid }) {
     ...SUPPLEMENT_LAW_ARTICLES_9,
     ...SUPPLEMENT_LAW_ARTICLES_10,
     ...SUPPLEMENT_LAW_ARTICLES_11,
+    ...SUPPLEMENT_LAW_ARTICLES_12,
   ]
 
   const filtered = allArticles.filter(l => {
