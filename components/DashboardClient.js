@@ -29,7 +29,21 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
   const [examCategory, setExamCategory] = useState('全部')
   const [expandedId, setExpandedId] = useState(null)
   const supabase = createClient()
+  const [examDate, setExamDate] = useState(() => {
+  try { return localStorage.getItem('exam_date') || '' } catch { return '' }
+})
+const [editingDate, setEditingDate] = useState(false)
 
+const daysLeft = examDate
+  ? Math.ceil((new Date(examDate) - new Date()) / (1000 * 60 * 60 * 24))
+  : null
+
+const saveExamDate = (val) => {
+  setExamDate(val)
+  try { localStorage.setItem('exam_date', val) } catch {}
+  setEditingDate(false)
+}
+  
   const [messages, setMessages] = useState([])
   const [inputText, setInputText] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
@@ -128,11 +142,49 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
         </div>
       </div>
 
-      {!isPaid && (
-        <div style={{ background: '#fff8e1', borderBottom: '1px solid #fbbf24', padding: '10px 24px', textAlign: 'center', fontSize: '13px', color: '#92400e' }}>
-          🔑 免費版：<Link href="/activate" style={{ color: '#0f1f3d', fontWeight: 700 }}>輸入授權碼</Link> 或 <a href={CHECKOUT_MONTHLY} style={{ color: '#0f1f3d', fontWeight: 700 }}>升級付費版</a> 解鎖條法條 + AI無限問答
-        </div>
-      )}
+      {/* 免費版提示條（只有免費用戶看到） */}
+{!isPaid && (
+  <div style={{ background: '#fff8e1', borderBottom: '1px solid #fbbf24', padding: '10px 24px', textAlign: 'center', fontSize: '13px', color: '#92400e' }}>
+    🔑 免費版：<Link href="/activate" style={{ color: '#0f1f3d', fontWeight: 700 }}>輸入授權碼</Link> 或 <a href={CHECKOUT_MONTHLY} style={{ color: '#0f1f3d', fontWeight: 700 }}>升級付費版</a> 解鎖條法條 + AI無限問答
+  </div>
+)}
+
+{/* 考試倒數計時器（所有用戶都看到，獨立於 isPaid 之外） */}
+<div style={{ background: daysLeft !== null && daysLeft <= 30 ? '#fef2f2' : '#f0f4ff', borderBottom: '1px solid #e2e8f0', padding: '8px 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', fontSize: '13px' }}>
+  {editingDate ? (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <span style={{ color: '#374151', fontWeight: 600 }}>📅 設定考試日期：</span>
+      <input type="date" autoFocus
+        defaultValue={examDate}
+        onBlur={e => saveExamDate(e.target.value)}
+        onKeyDown={e => e.key === 'Enter' && saveExamDate(e.target.value)}
+        style={{ border: '1px solid #cbd5e1', borderRadius: '6px', padding: '3px 8px', fontSize: '13px' }} />
+      <button onClick={() => setEditingDate(false)}
+        style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '12px' }}>取消</button>
+    </div>
+  ) : daysLeft === null ? (
+    <button onClick={() => setEditingDate(true)}
+      style={{ background: 'none', border: '1px dashed #94a3b8', color: '#64748b', borderRadius: '6px', padding: '4px 14px', fontSize: '13px', cursor: 'pointer' }}>
+      📅 設定考試倒數日期
+    </button>
+  ) : (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <span style={{ fontSize: '18px' }}>{daysLeft <= 7 ? '🔥' : daysLeft <= 30 ? '⚡' : '📅'}</span>
+      <span style={{ color: '#374151' }}>距離考試還有</span>
+      <span style={{ fontWeight: 900, fontSize: '20px', color: daysLeft <= 7 ? '#dc2626' : daysLeft <= 30 ? '#d97706' : '#0f1f3d' }}>
+        {daysLeft > 0 ? daysLeft : 0}
+      </span>
+      <span style={{ color: '#374151' }}>天</span>
+      {daysLeft <= 0 && <span style={{ color: '#dc2626', fontWeight: 700 }}>（考試日到了！加油！）</span>}
+      <button onClick={() => setEditingDate(true)}
+        style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '11px', textDecoration: 'underline' }}>
+        修改
+      </button>
+      <button onClick={() => { setExamDate(''); try { localStorage.removeItem('exam_date') } catch {} }}
+        style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '11px' }}>✕</button>
+    </div>
+  )}
+</div>
 
       <div className="page-container">
         <div className="tab-bar">
