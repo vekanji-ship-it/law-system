@@ -10,6 +10,7 @@ import { SUPPLEMENT_LAW_ARTICLES_6 } from '../lib/supplement-law-data-6'
 import { SUPPLEMENT_LAW_ARTICLES_7 } from '../lib/supplement-law-data-7'
 import { SUPPLEMENT_LAW_ARTICLES_8 } from '../lib/supplement-law-data-8'
 import { SUPPLEMENT_LAW_ARTICLES_9 } from '../lib/supplement-law-data-9'
+import { SUPPLEMENT_LAW_ARTICLES_9 } from '../lib/supplement-law-data-10'
 import Link from 'next/link'
 
 const CHECKOUT_URL = '/checkout'
@@ -22,7 +23,7 @@ export default function LawSection({ isPaid }) {
 
   const toggle = (id) => setExpandedId(expandedId === id ? null : id)
 
-  const allArticles = [...FULL_LAW_ARTICLES, ...SUPPLEMENT_LAW_ARTICLES_1, ...SUPPLEMENT_LAW_ARTICLES_2, ...SUPPLEMENT_LAW_ARTICLES_3, ...SUPPLEMENT_LAW_ARTICLES_4, ...SUPPLEMENT_LAW_ARTICLES_5, ...SUPPLEMENT_LAW_ARTICLES_6, ...SUPPLEMENT_LAW_ARTICLES_7, ...SUPPLEMENT_LAW_ARTICLES_8, ...SUPPLEMENT_LAW_ARTICLES_9]
+  const allArticles = [...FULL_LAW_ARTICLES, ...SUPPLEMENT_LAW_ARTICLES_1, ...SUPPLEMENT_LAW_ARTICLES_2, ...SUPPLEMENT_LAW_ARTICLES_3, ...SUPPLEMENT_LAW_ARTICLES_4, ...SUPPLEMENT_LAW_ARTICLES_5, ...SUPPLEMENT_LAW_ARTICLES_6, ...SUPPLEMENT_LAW_ARTICLES_7, ...SUPPLEMENT_LAW_ARTICLES_8, ...SUPPLEMENT_LAW_ARTICLES_9, ...SUPPLEMENT_LAW_ARTICLES_10]
 
   const filtered = allArticles.filter(l => {
     const matchCat = selectedCat === '全部' || l.catCode === selectedCat
