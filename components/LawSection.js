@@ -13,6 +13,7 @@ import { SUPPLEMENT_LAW_ARTICLES_9 } from '../lib/supplement-law-data-9'
 import { SUPPLEMENT_LAW_ARTICLES_10 } from '../lib/supplement-law-data-10'
 import Link from 'next/link'
 import LawHeatmap from './LawHeatmap'
+import LawRelationMap from './LawRelationMap'
 
 const CHECKOUT_URL = '/checkout'
 
@@ -132,6 +133,9 @@ export default function LawSection({ isPaid }) {
       {/* 命題頻率熱力圖 */}
       <LawHeatmap allArticles={allArticles} />
 
+      {/* 法條關聯地圖 */}
+      <LawRelationMap />
+        
       {/* Search */}
       <div style={{ marginBottom: '14px' }}>
         <input
