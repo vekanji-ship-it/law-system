@@ -20,10 +20,34 @@ export default function LawSection({ isPaid }) {
   const [searchText, setSearchText] = useState('')
   const [expandedId, setExpandedId] = useState(null)
   const [showFreq, setShowFreq] = useState('全部')
+  const [showBookmarks, setShowBookmarks] = useState(false)
+  const [bookmarks, setBookmarks] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('law_bookmarks') || '[]') } catch { return [] }
+  })
+
+  const toggleBookmark = (id) => {
+    const updated = bookmarks.includes(id)
+      ? bookmarks.filter(b => b !== id)
+      : [...bookmarks, id]
+    setBookmarks(updated)
+    localStorage.setItem('law_bookmarks', JSON.stringify(updated))
+  }
 
   const toggle = (id) => setExpandedId(expandedId === id ? null : id)
 
-  const allArticles = [...FULL_LAW_ARTICLES, ...SUPPLEMENT_LAW_ARTICLES_1, ...SUPPLEMENT_LAW_ARTICLES_2, ...SUPPLEMENT_LAW_ARTICLES_3, ...SUPPLEMENT_LAW_ARTICLES_4, ...SUPPLEMENT_LAW_ARTICLES_5, ...SUPPLEMENT_LAW_ARTICLES_6, ...SUPPLEMENT_LAW_ARTICLES_7, ...SUPPLEMENT_LAW_ARTICLES_8, ...SUPPLEMENT_LAW_ARTICLES_9, ...SUPPLEMENT_LAW_ARTICLES_10]
+  const allArticles = [
+    ...FULL_LAW_ARTICLES,
+    ...SUPPLEMENT_LAW_ARTICLES_1,
+    ...SUPPLEMENT_LAW_ARTICLES_2,
+    ...SUPPLEMENT_LAW_ARTICLES_3,
+    ...SUPPLEMENT_LAW_ARTICLES_4,
+    ...SUPPLEMENT_LAW_ARTICLES_5,
+    ...SUPPLEMENT_LAW_ARTICLES_6,
+    ...SUPPLEMENT_LAW_ARTICLES_7,
+    ...SUPPLEMENT_LAW_ARTICLES_8,
+    ...SUPPLEMENT_LAW_ARTICLES_9,
+    ...SUPPLEMENT_LAW_ARTICLES_10,
+  ]
 
   const filtered = allArticles.filter(l => {
     const matchCat = selectedCat === '全部' || l.catCode === selectedCat
@@ -32,7 +56,8 @@ export default function LawSection({ isPaid }) {
       l.code.includes(searchText) ||
       l.title.includes(searchText) ||
       l.detail.includes(searchText)
-    return matchCat && matchFreq && matchSearch
+    const matchBookmark = !showBookmarks || bookmarks.includes(l.id)
+    return matchCat && matchFreq && matchSearch && matchBookmark
   })
 
   const LockWall = () => (
@@ -60,6 +85,9 @@ export default function LawSection({ isPaid }) {
         </div>
         <div style={{ color: 'white', fontSize: '13px' }}>
           <span style={{ color: '#c9973a', fontWeight: 900, fontSize: '20px' }}>{LAW_CATEGORIES.length}</span> 大類別
+        </div>
+        <div style={{ color: 'white', fontSize: '13px' }}>
+          <span style={{ color: '#c9973a', fontWeight: 900, fontSize: '20px' }}>{bookmarks.length}</span> 已收藏
         </div>
         {!isPaid && (
           <div style={{ marginLeft: 'auto', background: 'rgba(201,151,58,0.2)', border: '1px solid rgba(201,151,58,0.4)', borderRadius: '20px', padding: '4px 14px', color: '#e8b95a', fontSize: '12px', fontWeight: 700 }}>
@@ -94,7 +122,7 @@ export default function LawSection({ isPaid }) {
         })}
       </div>
 
-      {/* Freq filter */}
+      {/* Freq filter + 收藏按鈕 */}
       <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
         {[['全部', '全部'], ['high', '★ 高頻'], ['medium', '◆ 中頻'], ['low', '◇ 一般']].map(([val, label]) => (
           <button key={val} onClick={() => setShowFreq(val)}
@@ -104,7 +132,17 @@ export default function LawSection({ isPaid }) {
             {label}
           </button>
         ))}
-        <span style={{ fontSize: '12px', color: '#94a3b8', marginLeft: '8px' }}>
+
+        {/* 收藏篩選按鈕 */}
+        <button onClick={() => setShowBookmarks(!showBookmarks)}
+          style={{ padding: '4px 12px', borderRadius: '20px', cursor: 'pointer', fontSize: '12px', fontWeight: 600,
+            background: showBookmarks ? '#fef9ec' : '#f1f5f9',
+            color: showBookmarks ? '#c9973a' : '#374151',
+            border: showBookmarks ? '1px solid #c9973a' : '1px solid transparent' }}>
+          🔖 收藏 ({bookmarks.length})
+        </button>
+
+        <span style={{ fontSize: '12px', color: '#94a3b8', marginLeft: '4px' }}>
           顯示 {filtered.length} / {allArticles.length} 條
         </span>
       </div>
@@ -113,12 +151,12 @@ export default function LawSection({ isPaid }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {filtered.map(l => (
           <div key={l.id} style={{
-  background: l.freq === 'high' ? '#fff8f8' : l.freq === 'medium' ? '#fffbf0' : 'white',
-  borderRadius: '10px',
-  border: l.freq === 'high' ? '1px solid #fca5a5' : l.freq === 'medium' ? '1px solid #fcd34d' : '1px solid #e2e8f0',
-  borderLeft: l.freq === 'high' ? '4px solid #dc2626' : l.freq === 'medium' ? '4px solid #d97706' : '1px solid #e2e8f0',
-  overflow: 'hidden'
-}}>
+            background: l.freq === 'high' ? '#fff8f8' : l.freq === 'medium' ? '#fffbf0' : 'white',
+            borderRadius: '10px',
+            border: l.freq === 'high' ? '1px solid #fca5a5' : l.freq === 'medium' ? '1px solid #fcd34d' : '1px solid #e2e8f0',
+            borderLeft: l.freq === 'high' ? '4px solid #dc2626' : l.freq === 'medium' ? '4px solid #d97706' : '1px solid #e2e8f0',
+            overflow: 'hidden'
+          }}>
             <div onClick={() => toggle(l.id)} style={{ cursor: 'pointer', padding: '14px 18px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', gap: '6px', marginBottom: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -138,7 +176,17 @@ export default function LawSection({ isPaid }) {
                 <div style={{ fontSize: '13px', color: '#374151', marginTop: '2px' }}>{l.title}</div>
                 <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>{l.subLabel}</div>
               </div>
-              <span style={{ color: '#94a3b8', fontSize: '18px', flexShrink: 0 }}>{expandedId === l.id ? '▲' : '▼'}</span>
+
+              {/* 右側：收藏鈕 + 展開箭頭 */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleBookmark(l.id) }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', padding: '2px', lineHeight: 1 }}
+                  title={bookmarks.includes(l.id) ? '取消收藏' : '加入收藏'}>
+                  {bookmarks.includes(l.id) ? '🔖' : '🤍'}
+                </button>
+                <span style={{ color: '#94a3b8', fontSize: '18px' }}>{expandedId === l.id ? '▲' : '▼'}</span>
+              </div>
             </div>
 
             {expandedId === l.id && (
