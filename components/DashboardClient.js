@@ -10,9 +10,11 @@ import { SUPPLEMENT_LAW_ARTICLES_7 } from '../lib/supplement-law-data-7'
 import { SUPPLEMENT_LAW_ARTICLES_8 } from '../lib/supplement-law-data-8'
 import { SUPPLEMENT_LAW_ARTICLES_9 } from '../lib/supplement-law-data-9'
 import { SUPPLEMENT_LAW_ARTICLES_10 } from '../lib/supplement-law-data-10'
+import { SUPPLEMENT_LAW_ARTICLES_11 } from '../lib/supplement-law-data-11'
 import { useState, useRef, useEffect } from 'react'
 import { createClient } from '../lib/supabase-client'
 import { CASES, EXAM_QUESTIONS, SOPS } from '../lib/data'
+import { REAL_CASES } from '../lib/content-data-v2'
 import LawSection from './LawSection'
 import RealCasesSection from './RealCasesSection'
 import ExamAppendixSection from './ExamAppendixSection'
@@ -23,9 +25,30 @@ const CHECKOUT_MONTHLY = '/checkout'
 const CHECKOUT_YEARLY = '/checkout'
 
 export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
-  const totalLaws = FULL_LAW_ARTICLES.length + SUPPLEMENT_LAW_ARTICLES_1.length + SUPPLEMENT_LAW_ARTICLES_2.length + SUPPLEMENT_LAW_ARTICLES_3.length + SUPPLEMENT_LAW_ARTICLES_4.length + SUPPLEMENT_LAW_ARTICLES_5.length + SUPPLEMENT_LAW_ARTICLES_6.length + SUPPLEMENT_LAW_ARTICLES_7.length + SUPPLEMENT_LAW_ARTICLES_8.length + SUPPLEMENT_LAW_ARTICLES_9.length + SUPPLEMENT_LAW_ARTICLES_10.length
+  const totalLaws =
+    FULL_LAW_ARTICLES.length +
+    SUPPLEMENT_LAW_ARTICLES_1.length +
+    SUPPLEMENT_LAW_ARTICLES_2.length +
+    SUPPLEMENT_LAW_ARTICLES_3.length +
+    SUPPLEMENT_LAW_ARTICLES_4.length +
+    SUPPLEMENT_LAW_ARTICLES_5.length +
+    SUPPLEMENT_LAW_ARTICLES_6.length +
+    SUPPLEMENT_LAW_ARTICLES_7.length +
+    SUPPLEMENT_LAW_ARTICLES_8.length +
+    SUPPLEMENT_LAW_ARTICLES_9.length +
+    SUPPLEMENT_LAW_ARTICLES_10.length +
+    SUPPLEMENT_LAW_ARTICLES_11.length
 
+  // 主 Tab
   const [tab, setTab] = useState('cases')
+
+  // 實務案例庫子分頁
+  const [caseSub, setCaseSub] = useState('cases')
+
+  // 考古題庫子分頁
+  const [examSub, setExamSub] = useState('exam_questions')
+
+  // 案例庫相關
   const [caseCategory, setCaseCategory] = useState('全部')
   const [examCategory, setExamCategory] = useState('全部')
   const [expandedId, setExpandedId] = useState(null)
@@ -80,7 +103,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
     const msgToSend = overrideMessages || messages
     if (!overrideMessages && (!inputText.trim() || aiLoading)) return
     setAiError('')
-
     let newMessages
     if (overrideMessages) {
       newMessages = overrideMessages
@@ -90,7 +112,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
       setMessages(newMessages)
       setInputText('')
     }
-
     setAiLoading(true)
     try {
       const res = await fetch('/api/ai-chat', {
@@ -134,13 +155,21 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
     <div style={{ background: '#fef9ec', border: '2px dashed #fbbf24', borderRadius: '12px', padding: '32px', textAlign: 'center', marginTop: '12px' }}>
       <div style={{ fontSize: '36px', marginBottom: '12px' }}>🔒</div>
       <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '8px', color: '#0f1f3d' }}>付費會員限定內容</h3>
-      <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '20px' }}>解鎖全部案例、條法條、考古題庫、SOP流程和 AI 無限問答</p>
+      <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '20px' }}>解鎖全部案例、法條、考古題庫、SOP流程和 AI 無限問答</p>
       <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
         <a href={CHECKOUT_MONTHLY} className="btn btn-gold">💳 NT$799/月 立即訂閱</a>
         <Link href="/activate" className="btn btn-outline">🔑 已有授權碼？點此輸入</Link>
       </div>
     </div>
   )
+
+  // 子分頁按鈕樣式
+  const subTabStyle = (active) => ({
+    padding: '7px 18px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+    fontSize: '13px', fontWeight: 700,
+    background: active ? '#0f1f3d' : '#f1f5f9',
+    color: active ? 'white' : '#374151',
+  })
 
   return (
     <div style={{ minHeight: '100vh', background: '#faf8f3' }}>
@@ -163,10 +192,10 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
         </div>
       </div>
 
-      {/* 免費版提示條 */}
+      {/* 免費版提示 */}
       {!isPaid && (
         <div style={{ background: '#fff8e1', borderBottom: '1px solid #fbbf24', padding: '10px 24px', textAlign: 'center', fontSize: '13px', color: '#92400e' }}>
-          🔑 免費版：<Link href="/activate" style={{ color: '#0f1f3d', fontWeight: 700 }}>輸入授權碼</Link> 或 <a href={CHECKOUT_MONTHLY} style={{ color: '#0f1f3d', fontWeight: 700 }}>升級付費版</a> 解鎖條法條 + AI無限問答
+          🔑 免費版：<Link href="/activate" style={{ color: '#0f1f3d', fontWeight: 700 }}>輸入授權碼</Link> 或 <a href={CHECKOUT_MONTHLY} style={{ color: '#0f1f3d', fontWeight: 700 }}>升級付費版</a> 解鎖法條 + AI無限問答
         </div>
       )}
 
@@ -175,13 +204,11 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
         {editingDate ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ color: '#374151', fontWeight: 600 }}>📅 設定考試日期：</span>
-            <input type="date" autoFocus
-              defaultValue={examDate}
+            <input type="date" autoFocus defaultValue={examDate}
               onBlur={e => saveExamDate(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && saveExamDate(e.target.value)}
               style={{ border: '1px solid #cbd5e1', borderRadius: '6px', padding: '3px 8px', fontSize: '13px' }} />
-            <button onClick={() => setEditingDate(false)}
-              style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '12px' }}>取消</button>
+            <button onClick={() => setEditingDate(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '12px' }}>取消</button>
           </div>
         ) : daysLeft === null ? (
           <button onClick={() => setEditingDate(true)}
@@ -197,28 +224,21 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
             </span>
             <span style={{ color: '#374151' }}>天</span>
             {daysLeft <= 0 && <span style={{ color: '#dc2626', fontWeight: 700 }}>（考試日到了！加油！）</span>}
-            <button onClick={() => setEditingDate(true)}
-              style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '11px', textDecoration: 'underline' }}>
-              修改
-            </button>
-            <button onClick={() => { setExamDate(''); try { localStorage.removeItem('exam_date') } catch {} }}
-              style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '11px' }}>✕</button>
+            <button onClick={() => setEditingDate(true)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '11px', textDecoration: 'underline' }}>修改</button>
+            <button onClick={() => { setExamDate(''); try { localStorage.removeItem('exam_date') } catch {} }} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '11px' }}>✕</button>
           </div>
         )}
       </div>
 
       <div className="page-container">
-        {/* Tab 導覽 */}
+        {/* 主 Tab 列（5個）*/}
         <div className="tab-bar">
           {[
-            { id: 'cases', label: '📂 案例庫', count: CASES.length },
-            { id: 'exams', label: '📝 考古題庫', count: EXAM_QUESTIONS.length },
-            { id: 'laws', label: '⚖️ 法條解析', count: totalLaws },
-            { id: 'practice', label: '🎯 練習模式', count: null },
-            { id: 'sops', label: '📋 實務SOP', count: SOPS.length },
-            { id: 'real_cases', label: '🏠 實務案例庫', count: 19 },
-            { id: 'exam_appendix', label: '📅 考古題附錄', count: 38 },
-            { id: 'ai', label: '🤖 AI問答', count: null },
+            { id: 'cases',    label: '📂 實務案例庫', count: CASES.length + SOPS.length + 19 },
+            { id: 'exams',    label: '📝 考古題庫',   count: EXAM_QUESTIONS.length + 38 },
+            { id: 'laws',     label: '⚖️ 法條解析',   count: totalLaws },
+            { id: 'practice', label: '🎯 練習模式',   count: null },
+            { id: 'ai',       label: '🤖 AI問答',     count: null },
           ].map(t => (
             <button key={t.id} className={`tab ${tab === t.id ? 'active' : ''}`} onClick={() => setTab(t.id)}
               style={t.id === 'ai' ? { position: 'relative' } : {}}>
@@ -229,7 +249,190 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
           ))}
         </div>
 
-        {/* ── AI 問答 ── */}
+        {/* ── 📂 實務案例庫（合併） ── */}
+        {tab === 'cases' && (
+          <div>
+            {/* 子分頁切換 */}
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', padding: '12px', background: 'white', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+              <button style={subTabStyle(caseSub === 'cases')} onClick={() => setCaseSub('cases')}>
+                📂 案例庫 ({CASES.length})
+              </button>
+              <button style={subTabStyle(caseSub === 'sops')} onClick={() => setCaseSub('sops')}>
+                📋 實務SOP ({SOPS.length})
+              </button>
+              <button style={subTabStyle(caseSub === 'real')} onClick={() => setCaseSub('real')}>
+                🏠 實務案例庫 (19)
+              </button>
+            </div>
+
+            {/* 案例庫 */}
+            {caseSub === 'cases' && (
+              <div>
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
+                  {caseCategories.map(cat => (
+                    <button key={cat} onClick={() => setCaseCategory(cat)} className="btn btn-sm"
+                      style={{ background: caseCategory === cat ? '#0f1f3d' : '#e2e8f0', color: caseCategory === cat ? 'white' : '#374151' }}>{cat}</button>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {filteredCases.map(c => (
+                    <div key={c.id} className="card" style={{ cursor: 'pointer' }}>
+                      <div onClick={() => toggle(c.id)} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                            <span className="badge badge-navy">{c.category}</span>
+                            <PaidBadge isPaidContent={c.isPaid} />
+                            <h3 style={{ fontSize: '16px', fontWeight: 700 }}>{c.title}</h3>
+                          </div>
+                          <p style={{ color: '#64748b', fontSize: '14px' }}>{c.summary}</p>
+                        </div>
+                        <span style={{ color: '#94a3b8', fontSize: '20px', flexShrink: 0 }}>{expandedId === c.id ? '▲' : '▼'}</span>
+                      </div>
+                      {expandedId === c.id && (
+                        c.isPaid && !isPaid ? <LockWall /> : (
+                          <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
+                            <Section title="💼 情境描述" content={c.situation} />
+                            <Section title="✅ 處理方式" content={c.solution} />
+                            <div style={{ marginBottom: '16px' }}>
+                              <div style={{ fontSize: '13px', fontWeight: 700, color: '#374151', marginBottom: '8px' }}>⚖️ 引用法條</div>
+                              {c.laws.map((l, i) => (
+                                <div key={i} style={{ background: '#f0f4ff', borderLeft: '3px solid #0f1f3d', padding: '10px 14px', borderRadius: '0 6px 6px 0', fontSize: '13px', color: '#1e40af', marginBottom: '6px' }}>{l}</div>
+                              ))}
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+                              <div style={{ background: '#f0fdf4', padding: '12px', borderRadius: '8px', fontSize: '13px' }}>
+                                <div style={{ fontWeight: 700, color: '#16a34a', marginBottom: '4px' }}>🏛️ 地政士視角</div>
+                                <div style={{ color: '#374151' }}>{c.agentView}</div>
+                              </div>
+                              <div style={{ background: '#fef9ec', padding: '12px', borderRadius: '8px', fontSize: '13px' }}>
+                                <div style={{ fontWeight: 700, color: '#d97706', marginBottom: '4px' }}>🏡 房仲視角</div>
+                                <div style={{ color: '#374151' }}>{c.brokerView}</div>
+                              </div>
+                            </div>
+                            <Section title="💡 實務小提醒" content={c.tips} bg="#f8fafc" />
+                          </div>
+                        )
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 實務SOP */}
+            {caseSub === 'sops' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {SOPS.map(s => (
+                  <div key={s.id} className="card">
+                    <div onClick={() => toggle(s.id)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <h3 style={{ fontSize: '17px', fontWeight: 800 }}>{s.title}</h3>
+                        <PaidBadge isPaidContent={s.isPaid} />
+                      </div>
+                      <span style={{ color: '#94a3b8', fontSize: '20px', flexShrink: 0 }}>{expandedId === s.id ? '▲' : '▼'}</span>
+                    </div>
+                    {expandedId === s.id && (
+                      s.isPaid && !isPaid ? <LockWall /> : (
+                        <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
+                          {s.steps.map((step, i) => (
+                            <div key={i} style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                              <div style={{ flexShrink: 0, width: '36px', height: '36px', background: '#0f1f3d', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '14px' }}>{step.step}</div>
+                              <div style={{ flex: 1, paddingTop: '6px' }}>
+                                <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '4px' }}>{step.title}</div>
+                                <div style={{ fontSize: '14px', color: '#374151', marginBottom: '6px' }}>{step.detail}</div>
+                                <div style={{ fontSize: '12px', color: '#c9973a', fontWeight: 600 }}>💡 {step.tip}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 實務案例庫 */}
+            {caseSub === 'real' && <RealCasesSection isPaid={isPaid} />}
+          </div>
+        )}
+
+        {/* ── 📝 考古題庫（合併） ── */}
+        {tab === 'exams' && (
+          <div>
+            {/* 子分頁切換 */}
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', padding: '12px', background: 'white', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+              <button style={subTabStyle(examSub === 'exam_questions')} onClick={() => setExamSub('exam_questions')}>
+                📝 考古題庫 ({EXAM_QUESTIONS.length})
+              </button>
+              <button style={subTabStyle(examSub === 'exam_appendix')} onClick={() => setExamSub('exam_appendix')}>
+                📅 考古題附錄（含113模考）(38)
+              </button>
+            </div>
+
+            {/* 考古題庫 */}
+            {examSub === 'exam_questions' && (
+              <div>
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
+                  {examCategories.map(cat => (
+                    <button key={cat} onClick={() => setExamCategory(cat)} className="btn btn-sm"
+                      style={{ background: examCategory === cat ? '#0f1f3d' : '#e2e8f0', color: examCategory === cat ? 'white' : '#374151' }}>{cat}</button>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {filteredExams.map(q => (
+                    <div key={q.id} className="card">
+                      <div onClick={() => toggle(q.id)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                            <span className="badge badge-navy">{q.category}</span>
+                            <span className="badge" style={{ background: '#f0f4ff', color: '#1e40af' }}>{q.year}</span>
+                            <PaidBadge isPaidContent={q.isPaid} />
+                          </div>
+                          <p style={{ fontSize: '15px', fontWeight: 600, color: '#1a1a2e' }}>{q.question}</p>
+                        </div>
+                        <span style={{ color: '#94a3b8', fontSize: '20px', flexShrink: 0 }}>{expandedId === q.id ? '▲' : '▼'}</span>
+                      </div>
+                      {expandedId === q.id && (
+                        q.isPaid && !isPaid ? <LockWall /> : (
+                          <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e2e8f0' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+                              {q.options.map((opt, i) => (
+                                <div key={i} style={{ padding: '10px 14px', borderRadius: '8px', fontSize: '14px',
+                                  background: opt.startsWith(q.answer) ? '#f0fdf4' : '#f8fafc',
+                                  border: opt.startsWith(q.answer) ? '2px solid #16a34a' : '1px solid #e2e8f0',
+                                  fontWeight: opt.startsWith(q.answer) ? 700 : 400,
+                                  color: opt.startsWith(q.answer) ? '#16a34a' : '#374151' }}>
+                                  {opt.startsWith(q.answer) ? '✓ ' : ''}{opt}
+                                </div>
+                              ))}
+                            </div>
+                            <div style={{ background: '#f0f4ff', borderRadius: '8px', padding: '16px', marginBottom: '12px' }}>
+                              <div style={{ fontWeight: 700, color: '#1e40af', marginBottom: '6px', fontSize: '13px' }}>📖 解題說明</div>
+                              <div style={{ fontSize: '14px', color: '#1e3a8a', lineHeight: 1.7, whiteSpace: 'pre-line' }}>{q.explanation}</div>
+                            </div>
+                            <div style={{ background: '#fef9ec', borderLeft: '3px solid #c9973a', padding: '10px 14px', borderRadius: '0 8px 8px 0', fontSize: '13px', color: '#92400e' }}>⚖️ 引用法條：{q.law}</div>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 考古題附錄 */}
+            {examSub === 'exam_appendix' && <ExamAppendixSection isPaid={isPaid} />}
+          </div>
+        )}
+
+        {/* ── ⚖️ 法條解析 ── */}
+        {tab === 'laws' && <LawSection isPaid={isPaid} />}
+
+        {/* ── 🎯 練習模式 ── */}
+        {tab === 'practice' && <PracticeModeSection isPaid={isPaid} />}
+
+        {/* ── 🤖 AI 問答 ── */}
         {tab === 'ai' && (
           <div style={{ maxWidth: '800px', margin: '0 auto' }}>
             <div style={{ background: 'linear-gradient(135deg, #0f1f3d, #1a3260)', borderRadius: '16px', padding: '24px', marginBottom: '20px', color: 'white', textAlign: 'center' }}>
@@ -240,8 +443,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
               <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px' }}>
                 {aiMode === 'quiz' ? 'AI 出題 → 你作答 → AI 詳細解析' : '專業回答地政士與房仲的法律、稅務、登記實務問題'}
               </p>
-
-              {/* 模式切換 */}
               <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '14px' }}>
                 <button onClick={() => { setAiMode('chat'); setMessages([]); setAiError('') }}
                   style={{ padding: '6px 18px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 700,
@@ -256,8 +457,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
                   🎓 出題模式
                 </button>
               </div>
-
-              {/* 出題模式主題選擇 */}
               {aiMode === 'quiz' && (
                 <div style={{ marginTop: '14px' }}>
                   <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginBottom: '8px' }}>選擇出題範圍：</div>
@@ -265,15 +464,13 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
                     {['土地法規', '土地稅法', '民法物權', '繼承登記', '不動產經紀', '信託法', '都市計畫', '農地法規', '隨機混合'].map(t => (
                       <button key={t} onClick={() => setQuizTopic(t)}
                         style={{ padding: '4px 12px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: '12px',
-                          background: quizTopic === t ? '#c9973a' : 'transparent',
-                          color: 'white', fontWeight: quizTopic === t ? 700 : 400 }}>
+                          background: quizTopic === t ? '#c9973a' : 'transparent', color: 'white', fontWeight: quizTopic === t ? 700 : 400 }}>
                         {t}
                       </button>
                     ))}
                   </div>
                 </div>
               )}
-
               {!isPaid && (
                 <div style={{ marginTop: '12px', background: 'rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px 16px', fontSize: '13px' }}>
                   免費版剩餘問答：<strong style={{ color: '#fbbf24' }}>{Math.max(0, freeLimit - freeQuestions)} / {freeLimit}</strong> 次
@@ -282,28 +479,21 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
               )}
             </div>
 
-            {/* 出題模式：開始按鈕 */}
             {aiMode === 'quiz' && messages.length === 0 && (
               <div style={{ textAlign: 'center', marginBottom: '20px', background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '32px' }}>
                 <div style={{ fontSize: '48px', marginBottom: '12px' }}>🎓</div>
-                <p style={{ fontSize: '15px', color: '#374151', marginBottom: '8px', fontWeight: 600 }}>
-                  準備好了嗎？
-                </p>
-                <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '20px' }}>
-                  主題：<strong style={{ color: '#c9973a' }}>{quizTopic}</strong>
-                </p>
+                <p style={{ fontSize: '15px', color: '#374151', marginBottom: '8px', fontWeight: 600 }}>準備好了嗎？</p>
+                <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '20px' }}>主題：<strong style={{ color: '#c9973a' }}>{quizTopic}</strong></p>
                 <button onClick={handleStartQuiz}
                   style={{ padding: '14px 40px', background: '#c9973a', color: 'white', border: 'none', borderRadius: '10px', fontSize: '16px', fontWeight: 800, cursor: 'pointer' }}>
                   🎓 出一道考題
                 </button>
-                <p style={{ fontSize: '12px', color: '#94a3b8', marginTop: '10px' }}>AI 將出一道四選一選擇題，附詳細解析</p>
               </div>
             )}
 
-            {/* 問答模式：常見問題 */}
             {aiMode === 'chat' && messages.length === 0 && (
               <div style={{ marginBottom: '20px' }}>
-                <div style={{ fontSize: '13px', fontWeight: 700, color: '#64748b', marginBottom: '10px' }}>💡 常見問題範例（點擊快速提問）</div>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: '#64748b', marginBottom: '10px' }}>💡 常見問題範例</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {SUGGESTED_QUESTIONS.map((q, i) => (
                     <button key={i} onClick={() => setInputText(q)}
@@ -315,7 +505,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
               </div>
             )}
 
-            {/* 對話記錄 */}
             {messages.length > 0 && (
               <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '20px', marginBottom: '16px', maxHeight: '500px', overflowY: 'auto' }}>
                 {messages.map((m, i) => (
@@ -330,11 +519,9 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
                 ))}
                 {aiLoading && (
                   <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#c9973a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {aiMode === 'quiz' ? '🎓' : '🤖'}
-                    </div>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#c9973a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{aiMode === 'quiz' ? '🎓' : '🤖'}</div>
                     <div style={{ background: '#faf8f3', borderRadius: '4px 12px 12px 12px', padding: '12px 16px', fontSize: '14px', color: '#64748b' }}>
-                      {aiMode === 'quiz' ? '出題中，請稍候...' : 'AI 顧問思考中...'}
+                      {aiMode === 'quiz' ? '出題中...' : 'AI 顧問思考中...'}
                     </div>
                   </div>
                 )}
@@ -349,7 +536,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
               </div>
             )}
 
-            {/* 出題模式：答題後「再出一題」按鈕 */}
             {aiMode === 'quiz' && messages.length > 0 && !aiLoading && (
               <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
                 <button onClick={handleStartQuiz}
@@ -363,7 +549,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
               </div>
             )}
 
-            {/* 問答模式：輸入框 */}
             {aiMode === 'chat' && (
               <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '12px', display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
                 <textarea value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={handleKeyDown}
@@ -387,151 +572,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
             <p style={{ marginTop: '12px', fontSize: '12px', color: '#94a3b8', textAlign: 'center' }}>AI 回答僅供參考，具體個案建議諮詢持照地政士或律師</p>
           </div>
         )}
-
-        {/* ── 案例庫 ── */}
-        {tab === 'cases' && (
-          <div>
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
-              {caseCategories.map(cat => (
-                <button key={cat} onClick={() => setCaseCategory(cat)} className="btn btn-sm" style={{ background: caseCategory === cat ? '#0f1f3d' : '#e2e8f0', color: caseCategory === cat ? 'white' : '#374151' }}>{cat}</button>
-              ))}
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {filteredCases.map(c => (
-                <div key={c.id} className="card" style={{ cursor: 'pointer' }}>
-                  <div onClick={() => toggle(c.id)} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
-                        <span className="badge badge-navy">{c.category}</span>
-                        <PaidBadge isPaidContent={c.isPaid} />
-                        <h3 style={{ fontSize: '16px', fontWeight: 700 }}>{c.title}</h3>
-                      </div>
-                      <p style={{ color: '#64748b', fontSize: '14px' }}>{c.summary}</p>
-                    </div>
-                    <span style={{ color: '#94a3b8', fontSize: '20px', flexShrink: 0 }}>{expandedId === c.id ? '▲' : '▼'}</span>
-                  </div>
-                  {expandedId === c.id && (
-                    c.isPaid && !isPaid ? <LockWall /> : (
-                      <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
-                        <Section title="💼 情境描述" content={c.situation} />
-                        <Section title="✅ 處理方式" content={c.solution} />
-                        <div style={{ marginBottom: '16px' }}>
-                          <div style={{ fontSize: '13px', fontWeight: 700, color: '#374151', marginBottom: '8px' }}>⚖️ 引用法條</div>
-                          {c.laws.map((l, i) => (
-                            <div key={i} style={{ background: '#f0f4ff', borderLeft: '3px solid #0f1f3d', padding: '10px 14px', borderRadius: '0 6px 6px 0', fontSize: '13px', color: '#1e40af', marginBottom: '6px' }}>{l}</div>
-                          ))}
-                        </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-                          <div style={{ background: '#f0fdf4', padding: '12px', borderRadius: '8px', fontSize: '13px' }}>
-                            <div style={{ fontWeight: 700, color: '#16a34a', marginBottom: '4px' }}>🏛️ 地政士視角</div>
-                            <div style={{ color: '#374151' }}>{c.agentView}</div>
-                          </div>
-                          <div style={{ background: '#fef9ec', padding: '12px', borderRadius: '8px', fontSize: '13px' }}>
-                            <div style={{ fontWeight: 700, color: '#d97706', marginBottom: '4px' }}>🏡 房仲視角</div>
-                            <div style={{ color: '#374151' }}>{c.brokerView}</div>
-                          </div>
-                        </div>
-                        <Section title="💡 實務小提醒" content={c.tips} bg="#f8fafc" />
-                      </div>
-                    )
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ── 考古題庫 ── */}
-        {tab === 'exams' && (
-          <div>
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
-              {examCategories.map(cat => (
-                <button key={cat} onClick={() => setExamCategory(cat)} className="btn btn-sm" style={{ background: examCategory === cat ? '#0f1f3d' : '#e2e8f0', color: examCategory === cat ? 'white' : '#374151' }}>{cat}</button>
-              ))}
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {filteredExams.map(q => (
-                <div key={q.id} className="card">
-                  <div onClick={() => toggle(q.id)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                        <span className="badge badge-navy">{q.category}</span>
-                        <span className="badge" style={{ background: '#f0f4ff', color: '#1e40af' }}>{q.year}</span>
-                        <PaidBadge isPaidContent={q.isPaid} />
-                      </div>
-                      <p style={{ fontSize: '15px', fontWeight: 600, color: '#1a1a2e' }}>{q.question}</p>
-                    </div>
-                    <span style={{ color: '#94a3b8', fontSize: '20px', flexShrink: 0 }}>{expandedId === q.id ? '▲' : '▼'}</span>
-                  </div>
-                  {expandedId === q.id && (
-                    q.isPaid && !isPaid ? <LockWall /> : (
-                      <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e2e8f0' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
-                          {q.options.map((opt, i) => (
-                            <div key={i} style={{ padding: '10px 14px', borderRadius: '8px', fontSize: '14px', background: opt.startsWith(q.answer) ? '#f0fdf4' : '#f8fafc', border: opt.startsWith(q.answer) ? '2px solid #16a34a' : '1px solid #e2e8f0', fontWeight: opt.startsWith(q.answer) ? 700 : 400, color: opt.startsWith(q.answer) ? '#16a34a' : '#374151' }}>
-                              {opt.startsWith(q.answer) ? '✓ ' : ''}{opt}
-                            </div>
-                          ))}
-                        </div>
-                        <div style={{ background: '#f0f4ff', borderRadius: '8px', padding: '16px', marginBottom: '12px' }}>
-                          <div style={{ fontWeight: 700, color: '#1e40af', marginBottom: '6px', fontSize: '13px' }}>📖 解題說明</div>
-                          <div style={{ fontSize: '14px', color: '#1e3a8a', lineHeight: 1.7, whiteSpace: 'pre-line' }}>{q.explanation}</div>
-                        </div>
-                        <div style={{ background: '#fef9ec', borderLeft: '3px solid #c9973a', padding: '10px 14px', borderRadius: '0 8px 8px 0', fontSize: '13px', color: '#92400e' }}>⚖️ 引用法條：{q.law}</div>
-                      </div>
-                    )
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ── 法條解析 ── */}
-        {tab === 'laws' && <LawSection isPaid={isPaid} />}
-
-        {/* ── 練習模式 ── */}
-        {tab === 'practice' && <PracticeModeSection isPaid={isPaid} />}
-
-        {/* ── 實務SOP ── */}
-        {tab === 'sops' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {SOPS.map(s => (
-              <div key={s.id} className="card">
-                <div onClick={() => toggle(s.id)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <h3 style={{ fontSize: '17px', fontWeight: 800 }}>{s.title}</h3>
-                    <PaidBadge isPaidContent={s.isPaid} />
-                  </div>
-                  <span style={{ color: '#94a3b8', fontSize: '20px', flexShrink: 0 }}>{expandedId === s.id ? '▲' : '▼'}</span>
-                </div>
-                {expandedId === s.id && (
-                  s.isPaid && !isPaid ? <LockWall /> : (
-                    <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
-                      {s.steps.map((step, i) => (
-                        <div key={i} style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
-                          <div style={{ flexShrink: 0, width: '36px', height: '36px', background: '#0f1f3d', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '14px' }}>{step.step}</div>
-                          <div style={{ flex: 1, paddingTop: '6px' }}>
-                            <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '4px' }}>{step.title}</div>
-                            <div style={{ fontSize: '14px', color: '#374151', marginBottom: '6px' }}>{step.detail}</div>
-                            <div style={{ fontSize: '12px', color: '#c9973a', fontWeight: 600 }}>💡 {step.tip}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* ── 實務案例庫 ── */}
-        {tab === 'real_cases' && <RealCasesSection isPaid={isPaid} />}
-
-        {/* ── 考古題附錄 ── */}
-        {tab === 'exam_appendix' && <ExamAppendixSection isPaid={isPaid} />}
-
       </div>
     </div>
   )
