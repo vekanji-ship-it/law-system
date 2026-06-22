@@ -112,7 +112,13 @@ export default function LawSection({ isPaid }) {
       {/* Law articles list */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {filtered.map(l => (
-          <div key={l.id} style={{ background: 'white', borderRadius: '10px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+          <div key={l.id} style={{
+  background: l.freq === 'high' ? '#fff8f8' : l.freq === 'medium' ? '#fffbf0' : 'white',
+  borderRadius: '10px',
+  border: l.freq === 'high' ? '1px solid #fca5a5' : l.freq === 'medium' ? '1px solid #fcd34d' : '1px solid #e2e8f0',
+  borderLeft: l.freq === 'high' ? '4px solid #dc2626' : l.freq === 'medium' ? '4px solid #d97706' : '1px solid #e2e8f0',
+  overflow: 'hidden'
+}}>
             <div onClick={() => toggle(l.id)} style={{ cursor: 'pointer', padding: '14px 18px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', gap: '6px', marginBottom: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
