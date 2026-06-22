@@ -10,7 +10,7 @@ import { SUPPLEMENT_LAW_ARTICLES_6 } from '../lib/supplement-law-data-6'
 import { SUPPLEMENT_LAW_ARTICLES_7 } from '../lib/supplement-law-data-7'
 import { SUPPLEMENT_LAW_ARTICLES_8 } from '../lib/supplement-law-data-8'
 import { SUPPLEMENT_LAW_ARTICLES_9 } from '../lib/supplement-law-data-9'
-import { SUPPLEMENT_LAW_ARTICLES_9 } from '../lib/supplement-law-data-10'
+import { SUPPLEMENT_LAW_ARTICLES_10 } from '../lib/supplement-law-data-10'
 import Link from 'next/link'
 
 const CHECKOUT_URL = '/checkout'
