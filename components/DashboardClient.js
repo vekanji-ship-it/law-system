@@ -9,6 +9,7 @@ import { SUPPLEMENT_LAW_ARTICLES_6 } from '../lib/supplement-law-data-6'
 import { SUPPLEMENT_LAW_ARTICLES_7 } from '../lib/supplement-law-data-7'
 import { SUPPLEMENT_LAW_ARTICLES_8 } from '../lib/supplement-law-data-8'
 import { SUPPLEMENT_LAW_ARTICLES_9 } from '../lib/supplement-law-data-9'
+import { SUPPLEMENT_LAW_ARTICLES_10 } from '../lib/supplement-law-data-10'
 import { useState, useRef, useEffect } from 'react'
 import { createClient } from '../lib/supabase-client'
 import { CASES, EXAM_QUESTIONS, SOPS } from '../lib/data'
@@ -21,7 +22,7 @@ const CHECKOUT_MONTHLY = '/checkout'
 const CHECKOUT_YEARLY = '/checkout'
 
 export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
-  const totalLaws = FULL_LAW_ARTICLES.length + SUPPLEMENT_LAW_ARTICLES_1.length + SUPPLEMENT_LAW_ARTICLES_2.length + SUPPLEMENT_LAW_ARTICLES_3.length + SUPPLEMENT_LAW_ARTICLES_4.length + SUPPLEMENT_LAW_ARTICLES_5.length + SUPPLEMENT_LAW_ARTICLES_6.length + SUPPLEMENT_LAW_ARTICLES_7.length + SUPPLEMENT_LAW_ARTICLES_8.length + SUPPLEMENT_LAW_ARTICLES_9.length
+  const totalLaws = FULL_LAW_ARTICLES.length + SUPPLEMENT_LAW_ARTICLES_1.length + SUPPLEMENT_LAW_ARTICLES_2.length + SUPPLEMENT_LAW_ARTICLES_3.length + SUPPLEMENT_LAW_ARTICLES_4.length + SUPPLEMENT_LAW_ARTICLES_5.length + SUPPLEMENT_LAW_ARTICLES_6.length + SUPPLEMENT_LAW_ARTICLES_7.length + SUPPLEMENT_LAW_ARTICLES_8.length + SUPPLEMENT_LAW_ARTICLES_9.length + SUPPLEMENT_LAW_ARTICLES_10.length
   const [tab, setTab] = useState('cases')
   const [caseCategory, setCaseCategory] = useState('全部')
   const [examCategory, setExamCategory] = useState('全部')
