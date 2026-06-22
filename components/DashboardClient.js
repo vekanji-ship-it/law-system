@@ -15,6 +15,8 @@ import { useState, useRef, useEffect } from 'react'
 import { createClient } from '../lib/supabase-client'
 import { CASES, EXAM_QUESTIONS, SOPS } from '../lib/data'
 import { REAL_CASES } from '../lib/content-data-v2'
+import { SUPPLEMENT_CASES } from '../lib/supplement-cases'
+import { SUPPLEMENT_EXAMS } from '../lib/supplement-exams'
 import LawSection from './LawSection'
 import RealCasesSection from './RealCasesSection'
 import ExamAppendixSection from './ExamAppendixSection'
@@ -39,22 +41,18 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
     SUPPLEMENT_LAW_ARTICLES_10.length +
     SUPPLEMENT_LAW_ARTICLES_11.length
 
-  // 主 Tab
+  // 合併補充資料
+  const allCases = [...CASES, ...SUPPLEMENT_CASES]
+  const allExams = [...EXAM_QUESTIONS, ...SUPPLEMENT_EXAMS]
+
   const [tab, setTab] = useState('cases')
-
-  // 實務案例庫子分頁
   const [caseSub, setCaseSub] = useState('cases')
-
-  // 考古題庫子分頁
   const [examSub, setExamSub] = useState('exam_questions')
-
-  // 案例庫相關
   const [caseCategory, setCaseCategory] = useState('全部')
   const [examCategory, setExamCategory] = useState('全部')
   const [expandedId, setExpandedId] = useState(null)
   const supabase = createClient()
 
-  // AI 問答
   const [messages, setMessages] = useState([])
   const [inputText, setInputText] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
@@ -63,7 +61,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
   const [quizTopic, setQuizTopic] = useState('隨機混合')
   const chatEndRef = useRef(null)
 
-  // 考試倒數
   const [examDate, setExamDate] = useState(() => {
     try { return localStorage.getItem('exam_date') || '' } catch { return '' }
   })
@@ -91,10 +88,10 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
   const toggle = (id) => setExpandedId(expandedId === id ? null : id)
 
   const caseCategories = ['全部', '繼承', '買賣', '稅務', '其他']
-  const examCategories = ['全部', '土地法規', '土地登記', '地政士法', '土地稅法', '民法物權', '不動產估價']
+  const examCategories = ['全部', '土地法規', '土地登記', '地政士法', '土地稅法', '民法物權', '不動產估價', '不動產經紀業管理法']
 
-  const filteredCases = CASES.filter(c => caseCategory === '全部' || c.category === caseCategory)
-  const filteredExams = EXAM_QUESTIONS.filter(q => examCategory === '全部' || q.category === examCategory)
+  const filteredCases = allCases.filter(c => caseCategory === '全部' || c.category === caseCategory)
+  const filteredExams = allExams.filter(q => examCategory === '全部' || q.category === examCategory)
 
   const freeQuestions = messages.filter(m => m.role === 'user').length
   const freeLimit = 3
@@ -163,7 +160,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
     </div>
   )
 
-  // 子分頁按鈕樣式
   const subTabStyle = (active) => ({
     padding: '7px 18px', borderRadius: '8px', border: 'none', cursor: 'pointer',
     fontSize: '13px', fontWeight: 700,
@@ -234,8 +230,8 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
         {/* 主 Tab 列（5個）*/}
         <div className="tab-bar">
           {[
-            { id: 'cases',    label: '📂 實務案例庫', count: CASES.length + SOPS.length + 19 },
-            { id: 'exams',    label: '📝 考古題庫',   count: EXAM_QUESTIONS.length + 38 },
+            { id: 'cases',    label: '📂 實務案例庫', count: allCases.length + SOPS.length + 19 },
+            { id: 'exams',    label: '📝 考古題庫',   count: allExams.length + 38 },
             { id: 'laws',     label: '⚖️ 法條解析',   count: totalLaws },
             { id: 'practice', label: '🎯 練習模式',   count: null },
             { id: 'ai',       label: '🤖 AI問答',     count: null },
@@ -252,10 +248,9 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
         {/* ── 📂 實務案例庫（合併） ── */}
         {tab === 'cases' && (
           <div>
-            {/* 子分頁切換 */}
             <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', padding: '12px', background: 'white', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
               <button style={subTabStyle(caseSub === 'cases')} onClick={() => setCaseSub('cases')}>
-                📂 案例庫 ({CASES.length})
+                📂 案例庫 ({allCases.length})
               </button>
               <button style={subTabStyle(caseSub === 'sops')} onClick={() => setCaseSub('sops')}>
                 📋 實務SOP ({SOPS.length})
@@ -265,7 +260,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
               </button>
             </div>
 
-            {/* 案例庫 */}
             {caseSub === 'cases' && (
               <div>
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
@@ -319,7 +313,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
               </div>
             )}
 
-            {/* 實務SOP */}
             {caseSub === 'sops' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {SOPS.map(s => (
@@ -352,7 +345,6 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
               </div>
             )}
 
-            {/* 實務案例庫 */}
             {caseSub === 'real' && <RealCasesSection isPaid={isPaid} />}
           </div>
         )}
@@ -360,17 +352,15 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
         {/* ── 📝 考古題庫（合併） ── */}
         {tab === 'exams' && (
           <div>
-            {/* 子分頁切換 */}
             <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', padding: '12px', background: 'white', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
               <button style={subTabStyle(examSub === 'exam_questions')} onClick={() => setExamSub('exam_questions')}>
-                📝 考古題庫 ({EXAM_QUESTIONS.length})
+                📝 考古題庫 ({allExams.length})
               </button>
               <button style={subTabStyle(examSub === 'exam_appendix')} onClick={() => setExamSub('exam_appendix')}>
                 📅 考古題附錄（含113模考）(38)
               </button>
             </div>
 
-            {/* 考古題庫 */}
             {examSub === 'exam_questions' && (
               <div>
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
@@ -421,15 +411,11 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
               </div>
             )}
 
-            {/* 考古題附錄 */}
             {examSub === 'exam_appendix' && <ExamAppendixSection isPaid={isPaid} />}
           </div>
         )}
 
-        {/* ── ⚖️ 法條解析 ── */}
         {tab === 'laws' && <LawSection isPaid={isPaid} />}
-
-        {/* ── 🎯 練習模式 ── */}
         {tab === 'practice' && <PracticeModeSection isPaid={isPaid} />}
 
         {/* ── 🤖 AI 問答 ── */}
