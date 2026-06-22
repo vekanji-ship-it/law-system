@@ -85,7 +85,7 @@ export default function LawSection({ isPaid }) {
           const count = cat === '全部' ? filtered.length : allArticles.filter(l => l.catCode === cat).length
           return (
             <button key={cat} onClick={() => setSelectedCat(cat)}
-              style={{ padding: '5px 12px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 600,
+              style={{ padding: '4px 10px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 600,
                 background: selectedCat === cat ? '#0f1f3d' : '#e2e8f0',
                 color: selectedCat === cat ? 'white' : '#374151' }}>
               {label} <span style={{ opacity: 0.6 }}>({count})</span>
