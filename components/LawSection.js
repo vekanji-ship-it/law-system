@@ -12,6 +12,7 @@ import { SUPPLEMENT_LAW_ARTICLES_8 } from '../lib/supplement-law-data-8'
 import { SUPPLEMENT_LAW_ARTICLES_9 } from '../lib/supplement-law-data-9'
 import { SUPPLEMENT_LAW_ARTICLES_10 } from '../lib/supplement-law-data-10'
 import Link from 'next/link'
+import LawHeatmap from './LawHeatmap'
 
 const CHECKOUT_URL = '/checkout'
 
@@ -127,6 +128,9 @@ export default function LawSection({ isPaid }) {
           <div style={{ background: 'linear-gradient(90deg, #16a34a, #4ade80)', height: '100%', borderRadius: '99px', width: `${readPercent}%`, transition: 'width 0.3s ease' }} />
         </div>
       </div>
+
+      {/* 命題頻率熱力圖 */}
+      <LawHeatmap allArticles={allArticles} />
 
       {/* Search */}
       <div style={{ marginBottom: '14px' }}>
