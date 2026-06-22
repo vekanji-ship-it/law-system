@@ -24,6 +24,9 @@ export default function LawSection({ isPaid }) {
   const [bookmarks, setBookmarks] = useState(() => {
     try { return JSON.parse(localStorage.getItem('law_bookmarks') || '[]') } catch { return [] }
   })
+  const [readIds, setReadIds] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('law_read') || '[]') } catch { return [] }
+  })
 
   const toggleBookmark = (id) => {
     const updated = bookmarks.includes(id)
@@ -33,7 +36,17 @@ export default function LawSection({ isPaid }) {
     localStorage.setItem('law_bookmarks', JSON.stringify(updated))
   }
 
-  const toggle = (id) => setExpandedId(expandedId === id ? null : id)
+  const markAsRead = (id) => {
+    if (readIds.includes(id)) return
+    const updated = [...readIds, id]
+    setReadIds(updated)
+    localStorage.setItem('law_read', JSON.stringify(updated))
+  }
+
+  const toggle = (id) => {
+    setExpandedId(expandedId === id ? null : id)
+    if (expandedId !== id) markAsRead(id)
+  }
 
   const allArticles = [
     ...FULL_LAW_ARTICLES,
@@ -60,6 +73,8 @@ export default function LawSection({ isPaid }) {
     return matchCat && matchFreq && matchSearch && matchBookmark
   })
 
+  const readPercent = Math.round(readIds.length / allArticles.length * 100)
+
   const LockWall = () => (
     <div style={{ background: '#fef9ec', border: '2px dashed #fbbf24', borderRadius: '10px', padding: '24px', textAlign: 'center', marginTop: '10px' }}>
       <div style={{ fontSize: '28px', marginBottom: '8px' }}>🔒</div>
@@ -79,7 +94,7 @@ export default function LawSection({ isPaid }) {
   return (
     <div>
       {/* Stats bar */}
-      <div style={{ background: '#0f1f3d', borderRadius: '10px', padding: '14px 20px', marginBottom: '16px', display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+      <div style={{ background: '#0f1f3d', borderRadius: '10px', padding: '14px 20px', marginBottom: '16px', display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{ color: 'white', fontSize: '13px' }}>
           <span style={{ color: '#c9973a', fontWeight: 900, fontSize: '20px' }}>{allArticles.length}</span> 條法條
         </div>
@@ -89,11 +104,28 @@ export default function LawSection({ isPaid }) {
         <div style={{ color: 'white', fontSize: '13px' }}>
           <span style={{ color: '#c9973a', fontWeight: 900, fontSize: '20px' }}>{bookmarks.length}</span> 已收藏
         </div>
+        <div style={{ color: 'white', fontSize: '13px' }}>
+          <span style={{ color: '#4ade80', fontWeight: 900, fontSize: '20px' }}>{readIds.length}</span> 已讀
+          <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', marginLeft: '4px' }}>
+            / {allArticles.length}（{readPercent}%）
+          </span>
+        </div>
         {!isPaid && (
           <div style={{ marginLeft: 'auto', background: 'rgba(201,151,58,0.2)', border: '1px solid rgba(201,151,58,0.4)', borderRadius: '20px', padding: '4px 14px', color: '#e8b95a', fontSize: '12px', fontWeight: 700 }}>
             免費版：部分免費條文可看
           </div>
         )}
+      </div>
+
+      {/* 已讀進度條 */}
+      <div style={{ marginBottom: '14px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+          <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>📖 學習進度</span>
+          <span style={{ fontSize: '11px', color: '#64748b' }}>{readIds.length} / {allArticles.length} 條（{readPercent}%）</span>
+        </div>
+        <div style={{ background: '#e2e8f0', borderRadius: '99px', height: '6px', overflow: 'hidden' }}>
+          <div style={{ background: 'linear-gradient(90deg, #16a34a, #4ade80)', height: '100%', borderRadius: '99px', width: `${readPercent}%`, transition: 'width 0.3s ease' }} />
+        </div>
       </div>
 
       {/* Search */}
@@ -132,8 +164,6 @@ export default function LawSection({ isPaid }) {
             {label}
           </button>
         ))}
-
-        {/* 收藏篩選按鈕 */}
         <button onClick={() => setShowBookmarks(!showBookmarks)}
           style={{ padding: '4px 12px', borderRadius: '20px', cursor: 'pointer', fontSize: '12px', fontWeight: 600,
             background: showBookmarks ? '#fef9ec' : '#f1f5f9',
@@ -141,7 +171,6 @@ export default function LawSection({ isPaid }) {
             border: showBookmarks ? '1px solid #c9973a' : '1px solid transparent' }}>
           🔖 收藏 ({bookmarks.length})
         </button>
-
         <span style={{ fontSize: '12px', color: '#94a3b8', marginLeft: '4px' }}>
           顯示 {filtered.length} / {allArticles.length} 條
         </span>
@@ -149,57 +178,67 @@ export default function LawSection({ isPaid }) {
 
       {/* Law articles list */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {filtered.map(l => (
-          <div key={l.id} style={{
-            background: l.freq === 'high' ? '#fff8f8' : l.freq === 'medium' ? '#fffbf0' : 'white',
-            borderRadius: '10px',
-            border: l.freq === 'high' ? '1px solid #fca5a5' : l.freq === 'medium' ? '1px solid #fcd34d' : '1px solid #e2e8f0',
-            borderLeft: l.freq === 'high' ? '4px solid #dc2626' : l.freq === 'medium' ? '4px solid #d97706' : '1px solid #e2e8f0',
-            overflow: 'hidden'
-          }}>
-            <div onClick={() => toggle(l.id)} style={{ cursor: 'pointer', padding: '14px 18px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', gap: '6px', marginBottom: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-                  <span style={{ background: '#0f1f3d', color: 'white', fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
-                    {l.catCode}
-                  </span>
-                  <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: 700,
-                    background: l.freq === 'high' ? '#fef2f2' : l.freq === 'medium' ? '#fffbeb' : '#f8fafc',
-                    color: l.freq === 'high' ? '#dc2626' : l.freq === 'medium' ? '#d97706' : '#6b7280' }}>
-                    {l.freqLabel}
-                  </span>
-                  {!l.isPaid && <span style={{ background: '#dcfce7', color: '#16a34a', fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>✓ 免費</span>}
-                  {l.isPaid && isPaid && <span style={{ background: '#dcfce7', color: '#16a34a', fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>✓ 已解鎖</span>}
-                  {l.isPaid && !isPaid && <span style={{ background: '#fef9ec', color: '#92400e', border: '1px solid #fbbf24', fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>🔒 付費</span>}
-                </div>
-                <div style={{ fontWeight: 800, fontSize: '14px', color: '#0f1f3d' }}>{l.code}</div>
-                <div style={{ fontSize: '13px', color: '#374151', marginTop: '2px' }}>{l.title}</div>
-                <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>{l.subLabel}</div>
-              </div>
-
-              {/* 右側：收藏鈕 + 展開箭頭 */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                <button
-                  onClick={(e) => { e.stopPropagation(); toggleBookmark(l.id) }}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', padding: '2px', lineHeight: 1 }}
-                  title={bookmarks.includes(l.id) ? '取消收藏' : '加入收藏'}>
-                  {bookmarks.includes(l.id) ? '🔖' : '🤍'}
-                </button>
-                <span style={{ color: '#94a3b8', fontSize: '18px' }}>{expandedId === l.id ? '▲' : '▼'}</span>
-              </div>
-            </div>
-
-            {expandedId === l.id && (
-              l.isPaid && !isPaid ? <div style={{ padding: '0 18px 18px' }}><LockWall /></div> : (
-                <div style={{ padding: '0 18px 18px', borderTop: '1px solid #e2e8f0' }}>
-                  <div style={{ marginTop: '16px', background: '#f8fafc', borderRadius: '8px', padding: '16px', fontFamily: 'monospace', fontSize: '13px', lineHeight: 1.9, color: '#1e293b', whiteSpace: 'pre-wrap', borderLeft: '4px solid #0f1f3d' }}>
-                    {l.detail}
+        {filtered.map(l => {
+          const isRead = readIds.includes(l.id)
+          const isBookmarked = bookmarks.includes(l.id)
+          return (
+            <div key={l.id} style={{
+              background: l.freq === 'high' ? '#fff8f8' : l.freq === 'medium' ? '#fffbf0' : 'white',
+              borderRadius: '10px',
+              border: l.freq === 'high' ? '1px solid #fca5a5' : l.freq === 'medium' ? '1px solid #fcd34d' : '1px solid #e2e8f0',
+              borderLeft: l.freq === 'high' ? '4px solid #dc2626' : l.freq === 'medium' ? '4px solid #d97706' : '1px solid #e2e8f0',
+              overflow: 'hidden',
+              opacity: isRead ? 0.85 : 1,
+            }}>
+              <div onClick={() => toggle(l.id)} style={{ cursor: 'pointer', padding: '14px 18px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', gap: '6px', marginBottom: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <span style={{ background: '#0f1f3d', color: 'white', fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
+                      {l.catCode}
+                    </span>
+                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: 700,
+                      background: l.freq === 'high' ? '#fef2f2' : l.freq === 'medium' ? '#fffbeb' : '#f8fafc',
+                      color: l.freq === 'high' ? '#dc2626' : l.freq === 'medium' ? '#d97706' : '#6b7280' }}>
+                      {l.freqLabel}
+                    </span>
+                    {isRead && (
+                      <span style={{ background: '#dcfce7', color: '#16a34a', fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
+                        ✓ 已讀
+                      </span>
+                    )}
+                    {!l.isPaid && <span style={{ background: '#dcfce7', color: '#16a34a', fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>✓ 免費</span>}
+                    {l.isPaid && isPaid && <span style={{ background: '#dcfce7', color: '#16a34a', fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>✓ 已解鎖</span>}
+                    {l.isPaid && !isPaid && <span style={{ background: '#fef9ec', color: '#92400e', border: '1px solid #fbbf24', fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>🔒 付費</span>}
                   </div>
+                  <div style={{ fontWeight: 800, fontSize: '14px', color: '#0f1f3d' }}>{l.code}</div>
+                  <div style={{ fontSize: '13px', color: '#374151', marginTop: '2px' }}>{l.title}</div>
+                  <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>{l.subLabel}</div>
                 </div>
-              )
-            )}
-          </div>
-        ))}
+
+                {/* 右側：收藏鈕 + 展開箭頭 */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); toggleBookmark(l.id) }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', padding: '2px', lineHeight: 1 }}
+                    title={isBookmarked ? '取消收藏' : '加入收藏'}>
+                    {isBookmarked ? '🔖' : '🤍'}
+                  </button>
+                  <span style={{ color: '#94a3b8', fontSize: '18px' }}>{expandedId === l.id ? '▲' : '▼'}</span>
+                </div>
+              </div>
+
+              {expandedId === l.id && (
+                l.isPaid && !isPaid ? <div style={{ padding: '0 18px 18px' }}><LockWall /></div> : (
+                  <div style={{ padding: '0 18px 18px', borderTop: '1px solid #e2e8f0' }}>
+                    <div style={{ marginTop: '16px', background: '#f8fafc', borderRadius: '8px', padding: '16px', fontFamily: 'monospace', fontSize: '13px', lineHeight: 1.9, color: '#1e293b', whiteSpace: 'pre-wrap', borderLeft: '4px solid #0f1f3d' }}>
+                      {l.detail}
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+          )
+        })}
       </div>
     </div>
   )
