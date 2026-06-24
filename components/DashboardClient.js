@@ -19,6 +19,7 @@ import { SUPPLEMENT_LAW_ARTICLES_16 } from '../lib/supplement-law-data-16'
 import { SUPPLEMENT_LAW_ARTICLES_17 } from '../lib/supplement-law-data-17'
 import { SUPPLEMENT_LAW_ARTICLES_18 } from '../lib/supplement-law-data-18'
 import { SUPPLEMENT_LAW_ARTICLES_19 } from '../lib/supplement-law-data-19'
+import { SUPPLEMENT_LAW_ARTICLES_20 } from '../lib/supplement-law-data-20'
 import { useState, useRef, useEffect } from 'react'
 import { createClient } from '../lib/supabase-client'
 import { CASES, EXAM_QUESTIONS, SOPS } from '../lib/data'
@@ -55,7 +56,8 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
     SUPPLEMENT_LAW_ARTICLES_16.length +
     SUPPLEMENT_LAW_ARTICLES_17.length +
     SUPPLEMENT_LAW_ARTICLES_18.length +
-    SUPPLEMENT_LAW_ARTICLES_19.length
+    SUPPLEMENT_LAW_ARTICLES_19.length +
+    SUPPLEMENT_LAW_ARTICLES_20.length
 
   // 合併補充資料
   const allCases = [...CASES, ...SUPPLEMENT_CASES]
