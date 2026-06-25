@@ -22,6 +22,7 @@ import { SUPPLEMENT_LAW_ARTICLES_18 } from '../lib/supplement-law-data-18'
 import { SUPPLEMENT_LAW_ARTICLES_19 } from '../lib/supplement-law-data-19'
 import { SUPPLEMENT_LAW_ARTICLES_20 } from '../lib/supplement-law-data-20'
 import { SUPPLEMENT_LAW_ARTICLES_21 } from '../lib/supplement-law-data-21'
+import { SUPPLEMENT_LAW_ARTICLES_22 } from '../lib/supplement-law-data-22'
 import LawHeatmap from './LawHeatmap'
 import LawRelationMap from './LawRelationMap'
 import Link from 'next/link'
@@ -86,7 +87,7 @@ export default function LawSection({ isPaid }) {
     ...SUPPLEMENT_LAW_ARTICLES_15, ...SUPPLEMENT_LAW_ARTICLES_16,
     ...SUPPLEMENT_LAW_ARTICLES_17, ...SUPPLEMENT_LAW_ARTICLES_18,
     ...SUPPLEMENT_LAW_ARTICLES_19, ...SUPPLEMENT_LAW_ARTICLES_20,
-    ...SUPPLEMENT_LAW_ARTICLES_21,
+    ...SUPPLEMENT_LAW_ARTICLES_21, ...SUPPLEMENT_LAW_ARTICLES_22,
   ].map(normalizeArticle), [])
 
   const toggleBookmark = (id) => {
