@@ -74,6 +74,9 @@ input:focus, textarea:focus {
 .tab-bar {
   display: flex; gap: 4px; background: #f1f5f9;
   padding: 4px; border-radius: 10px; margin-bottom: 24px;
+  overflow-x: auto;                    /* ← 加這行 */
+  -webkit-overflow-scrolling: touch;   /* ← 加這行（iOS 順滑捲動） */
+  /* ... 其他樣式 */
 }
 .tab {
   flex: 1; padding: 10px; text-align: center; border-radius: 7px;
