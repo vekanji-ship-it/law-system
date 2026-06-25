@@ -70,7 +70,7 @@ function calcEstate({ gross, hasSpouse, childCount, parentCount, hasFuneral, dis
   const net = Math.max(0, g - EXEMPT - total_d)
 
   let tax = 0
-  if (net <= 50000000)      tax = net * 0.1
+  if (net <= 50000000)       tax = net * 0.1
   else if (net <= 100000000) tax = 5000000 + (net - 50000000) * 0.2
   else                       tax = 5000000 + 10000000 + (net - 100000000) * 0.3
 
@@ -84,7 +84,7 @@ function calcEstate({ gross, hasSpouse, childCount, parentCount, hasFuneral, dis
       { label: '喪葬費扣除額', val: fd, note: '138萬（固定）' },
       { label: '重度身心障礙扣除額', val: dd, note: `${disabledCount}人 × 338萬` },
       { label: '課稅遺產淨額', val: net, formula: `${fmt(g)} − ${fmt(EXEMPT)} − ${fmt(total_d)}` },
-      { label: '應納遺產稅', val: tax, formula: net <= 50000000 ? `${fmt(net)} × 10%` : net <= 100000000 ? `5,000萬 × 10% + （${fmt(net)}−5,000萬）× 20%` : '累進三級', highlight: true },
+      { label: '應納遺產稅', val: tax, formula: net <= 50000000 ? `${fmt(net)} × 10%` : net <= 100000000 ? `5,000萬×10% + （${fmt(net)}−5,000萬）×20%` : '累進三級', highlight: true },
     ],
     tax
   }
@@ -95,9 +95,9 @@ function calcGift({ amount }) {
   const EXEMPT = 2440000
   const net = Math.max(0, a - EXEMPT)
   let tax = 0
-  if (net <= 25000000)      tax = net * 0.1
-  else if (net <= 50000000) tax = 2500000 + (net - 25000000) * 0.15
-  else                      tax = 2500000 + 3750000 + (net - 50000000) * 0.2
+  if (net <= 25000000)       tax = net * 0.1
+  else if (net <= 50000000)  tax = 2500000 + (net - 25000000) * 0.15
+  else                       tax = 2500000 + 3750000 + (net - 50000000) * 0.2
 
   return {
     steps: [
@@ -115,7 +115,7 @@ function calcLandTax({ declared, selfUse, area }) {
   const a = Number(area) || 0
   if (d <= 0 || a <= 0) return null
   const base = d * a
-  const rate = selfUse ? 0.002 : 0.01  // 自用2‰, 一般10‰
+  const rate = selfUse ? 0.002 : 0.01
   const tax = base * rate
   return {
     steps: [
@@ -214,6 +214,8 @@ function LVTCalc() {
   const [form, setForm] = useState({ prev: '', current: '', isSelf: false })
   const set = k => v => setForm(f => ({ ...f, [k]: v }))
   const result = form.prev && form.current ? calcLVT(form) : null
+  const showWarning = form.prev && form.current && Number(form.current) <= Number(form.prev)
+
   return (
     <div>
       <div style={{ background: '#fef9ec', borderRadius: '8px', padding: '12px 14px', marginBottom: '16px', fontSize: '12px', color: '#92400e' }}>
@@ -222,11 +224,14 @@ function LVTCalc() {
       <Field label="前次移轉現值（原規定地價）" unit="元" value={form.prev} onChange={set('prev')} note="計算基礎" />
       <Field label="本次申報移轉現值" unit="元" value={form.current} onChange={set('current')} />
       <Toggle label="自用住宅用地" checked={form.isSelf} onChange={set('isSelf')} note="都市≤3公畝、非都市≤7公畝" />
-      <Steps result={result} />
-      {form.prev && form.current && Number(form.current) <= Number(form.prev) && (
-        <div style={{ marginTop: '10px', padding: '10px 14px', background: '#fef2f2', borderRadius: '6px', fontSize: '13px', color: '#dc2626', border: '1px solid #fecaca' }}>
+      {/* BUG3 FIX: 輸入異常提示 */}
+      {showWarning && (
+        <div style={{ marginTop: '4px', padding: '10px 14px', background: '#fef2f2', borderRadius: '6px', fontSize: '13px', color: '#dc2626', border: '1px solid #fecaca' }}>
           ⚠️ 移轉現值需大於前次移轉現值才需課稅（無漲價則免徵土地增值稅）
-       </div>
+        </div>
+      )}
+      <Steps result={result} />
+    </div>
   )
 }
 
@@ -292,14 +297,12 @@ export default function CalcPracticeSection() {
 
   return (
     <div style={{ maxWidth: '720px', margin: '0 auto' }}>
-      {/* 標題 */}
       <div style={{ background: 'linear-gradient(135deg, #0f1f3d, #1a3a6e)', borderRadius: '12px', padding: '20px 24px', marginBottom: '20px', color: 'white' }}>
         <div style={{ fontSize: '28px', marginBottom: '6px' }}>🧮</div>
         <h2 style={{ fontWeight: 900, fontSize: '18px', marginBottom: '4px' }}>計算題練習模式</h2>
         <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px' }}>輸入數字，自動拆解計算步驟——對照公式練習，考場不失分</p>
       </div>
 
-      {/* 計算機切換 */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '8px', marginBottom: '20px' }}>
         {CALCS.map(c => (
           <button key={c.id} onClick={() => setActive(c.id)}
@@ -312,12 +315,10 @@ export default function CalcPracticeSection() {
         ))}
       </div>
 
-      {/* 計算機本體 */}
       <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '24px' }}>
         <ActiveCalc />
       </div>
 
-      {/* 考試提醒 */}
       <div style={{ marginTop: '14px', background: '#f0f4ff', borderRadius: '8px', padding: '12px 14px', fontSize: '12px', color: '#1e40af', lineHeight: 1.8 }}>
         <strong>💡 計算題考試重點</strong>：土增稅常考漲幅跨級距計算、自用住宅申請條件；遺產稅常考扣除額加總；贈與稅注意每年重設的244萬免稅額；地價稅注意自用申請期間（9/22~10/5）
       </div>
