@@ -81,8 +81,13 @@ export default function PracticeModeSection({ isPaid }) {
   const [results, setResults]         = useState({ know: 0, review: 0 })
   const [reviewList, setReviewList]   = useState([])
 
+  // FIX: 過濾欄位損壞的舊版錯題資料
   const [wrongBook, setWrongBook] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('law_wrongbook') || '[]') } catch { return [] }
+    try {
+      const data = JSON.parse(localStorage.getItem('law_wrongbook') || '[]')
+      // 過濾欄位損壞的舊版資料（修復前存入的 undefined 欄位）
+      return data.filter(w => w.id && w.code && w.title)
+    } catch { return [] }
   })
   const [expandedWrong, setExpandedWrong] = useState(null)
 
