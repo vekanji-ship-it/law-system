@@ -223,7 +223,10 @@ function LVTCalc() {
       <Field label="本次申報移轉現值" unit="元" value={form.current} onChange={set('current')} />
       <Toggle label="自用住宅用地" checked={form.isSelf} onChange={set('isSelf')} note="都市≤3公畝、非都市≤7公畝" />
       <Steps result={result} />
-    </div>
+      {form.prev && form.current && Number(form.current) <= Number(form.prev) && (
+        <div style={{ marginTop: '10px', padding: '10px 14px', background: '#fef2f2', borderRadius: '6px', fontSize: '13px', color: '#dc2626', border: '1px solid #fecaca' }}>
+          ⚠️ 移轉現值需大於前次移轉現值才需課稅（無漲價則免徵土地增值稅）
+       </div>
   )
 }
 
