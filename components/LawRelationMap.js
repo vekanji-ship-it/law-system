@@ -224,6 +224,7 @@ export default function LawRelationMap({ onCategorySelect }) {
                 return (
                   <div
                     key={i}
+                    className="law-relation-node"
                     onClick={() => handleNodeClick(node)}
                     onMouseEnter={() => setHoveredNode(`${selected}-${i}`)}
                     onMouseLeave={() => setHoveredNode(null)}
