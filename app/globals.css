@@ -83,3 +83,117 @@ input:focus, textarea:focus {
 .tab.active { background: white; color: var(--navy); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
 
 .page-container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+
+/* ════════════════════════════════════════════
+   夜間模式 CSS 變數
+   在 globals.css 最底部加入此段
+   ════════════════════════════════════════════ */
+
+/* 預設（白天） */
+:root {
+  --bg-primary:   #faf8f3;
+  --bg-card:      #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tag:       #e2e8f0;
+  --text-primary: #0f1f3d;
+  --text-body:    #374151;
+  --text-muted:   #64748b;
+  --text-faint:   #94a3b8;
+  --border:       #e2e8f0;
+  --border-card:  #e2e8f0;
+  --navy:         #0f1f3d;
+  --navy-text:    #ffffff;
+  --gold:         #c9973a;
+  --shadow:       0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* 夜間模式 */
+html.dark {
+  --bg-primary:   #111827;
+  --bg-card:      #1f2937;
+  --bg-secondary: #1a2333;
+  --bg-tag:       #374151;
+  --text-primary: #f1f5f9;
+  --text-body:    #cbd5e1;
+  --text-muted:   #94a3b8;
+  --text-faint:   #64748b;
+  --border:       #374151;
+  --border-card:  #374151;
+  --navy:         #1e3a5f;
+  --navy-text:    #f1f5f9;
+  --gold:         #e8b95a;
+  --shadow:       0 1px 3px rgba(0,0,0,0.4);
+}
+
+/* 夜間模式基礎套用 */
+html.dark body {
+  background-color: var(--bg-primary);
+  color: var(--text-body);
+}
+
+html.dark .card,
+html.dark [style*="background: white"],
+html.dark [style*="background: #fff"],
+html.dark [style*="background:#fff"] {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  color: var(--text-body) !important;
+}
+
+html.dark [style*="background: #faf8f3"] {
+  background: var(--bg-primary) !important;
+}
+
+html.dark [style*="background: #f8fafc"],
+html.dark [style*="background: #f1f5f9"],
+html.dark [style*="background: #f0f4ff"] {
+  background: var(--bg-secondary) !important;
+}
+
+html.dark [style*="background: #e2e8f0"] {
+  background: var(--bg-tag) !important;
+}
+
+html.dark [style*="color: #374151"],
+html.dark [style*="color: #1a1a2e"],
+html.dark [style*="color: #0f1f3d"]:not(button):not(span) {
+  color: var(--text-body) !important;
+}
+
+html.dark [style*="color: #64748b"],
+html.dark [style*="color: #94a3b8"] {
+  color: var(--text-muted) !important;
+}
+
+html.dark [style*="border: 1px solid #e2e8f0"],
+html.dark [style*="border-color: #e2e8f0"] {
+  border-color: var(--border) !important;
+}
+
+html.dark input,
+html.dark textarea {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: var(--text-faint) !important;
+}
+
+/* 法條內文區塊 */
+html.dark [style*="background: #f8fafc"][style*="fontFamily: monospace"] {
+  background: #1a2333 !important;
+  color: #cbd5e1 !important;
+  border-left-color: #3b82f6 !important;
+}
+
+/* 高頻/中頻背景 */
+html.dark [style*="background: #fff8f8"] { background: #2d1515 !important; }
+html.dark [style*="background: #fffbf0"] { background: #2a2010 !important; }
+
+/* 捲動條美化（夜間） */
+html.dark ::-webkit-scrollbar { width: 6px; height: 6px; }
+html.dark ::-webkit-scrollbar-track { background: #1f2937; }
+html.dark ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
