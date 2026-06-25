@@ -11,7 +11,6 @@ import { SUPPLEMENT_LAW_ARTICLES_7  } from '../lib/supplement-law-data-7'
 import { SUPPLEMENT_LAW_ARTICLES_8  } from '../lib/supplement-law-data-8'
 import { SUPPLEMENT_LAW_ARTICLES_9  } from '../lib/supplement-law-data-9'
 import { SUPPLEMENT_LAW_ARTICLES_10 } from '../lib/supplement-law-data-10'
-// FIX 1: 補上缺少的 11～20
 import { SUPPLEMENT_LAW_ARTICLES_11 } from '../lib/supplement-law-data-11'
 import { SUPPLEMENT_LAW_ARTICLES_12 } from '../lib/supplement-law-data-12'
 import { SUPPLEMENT_LAW_ARTICLES_13 } from '../lib/supplement-law-data-13'
@@ -23,23 +22,16 @@ import { SUPPLEMENT_LAW_ARTICLES_18 } from '../lib/supplement-law-data-18'
 import { SUPPLEMENT_LAW_ARTICLES_19 } from '../lib/supplement-law-data-19'
 import { SUPPLEMENT_LAW_ARTICLES_20 } from '../lib/supplement-law-data-20'
 
-// ─────────────────────────────────────────────────
-// FIX 2: 統一欄位映射（與 LawSection.js 相同邏輯）
-// 舊格式：code / title / detail / freq('high'|'medium'|'low') / freqLabel / exam
-// 新格式：lawName / articleNo / content / frequency(1-5) / examType
-// ─────────────────────────────────────────────────
 const EXAM_TYPE_MAP = { '共同': 'both', '地政士': 'land_reg', '經紀人': 'broker' }
 
 const normalizeArticle = (article) => {
-  if (article.code) return article  // 舊格式，直接返回
-
+  if (article.code) return article
   const freq =
     typeof article.frequency === 'number'
       ? article.frequency >= 4 ? 'high'
         : article.frequency === 3 ? 'medium'
         : 'low'
       : 'low'
-
   return {
     ...article,
     code:     `${article.lawName} ${article.articleNo}`,
@@ -53,7 +45,6 @@ const normalizeArticle = (article) => {
   }
 }
 
-// FIX 1+2: 完整 20 批 + 全部 normalize
 const RAW_ARTICLES = [
   ...FULL_LAW_ARTICLES,
   ...SUPPLEMENT_LAW_ARTICLES_1,  ...SUPPLEMENT_LAW_ARTICLES_2,
@@ -90,7 +81,6 @@ export default function PracticeModeSection({ isPaid }) {
   const [results, setResults]         = useState({ know: 0, review: 0 })
   const [reviewList, setReviewList]   = useState([])
 
-  // ── 錯題本（localStorage）──
   const [wrongBook, setWrongBook] = useState(() => {
     try { return JSON.parse(localStorage.getItem('law_wrongbook') || '[]') } catch { return [] }
   })
@@ -101,13 +91,11 @@ export default function PracticeModeSection({ isPaid }) {
     try { localStorage.setItem('law_wrongbook', JSON.stringify(updated)) } catch {}
   }
 
-  // FIX 2: addToWrongBook 儲存的是已 normalize 的文章，欄位完整
   const addToWrongBook = (article) => {
     if (wrongBook.find(w => w.id === article.id)) return
     saveWrongBook([...wrongBook, { ...article, addedAt: Date.now() }])
   }
 
-  // FIX 15: removeFromWrongBook 比對 id（normalize 後 id 不變）
   const removeFromWrongBook = (id) => {
     saveWrongBook(wrongBook.filter(w => w.id !== id))
   }
@@ -115,12 +103,10 @@ export default function PracticeModeSection({ isPaid }) {
   const startPractice = useCallback((customDeck) => {
     let d
     if (customDeck) {
-      // FIX 2: 從 wrongBook 重練時，確保文章也是 normalize 後的格式
       d = shuffle(customDeck.map(a => a.code ? a : normalizeArticle(a)))
     } else {
       let pool = ALL_ARTICLES.filter(l => {
         const matchCat  = filterCat === '全部' || l.catCode === filterCat
-        // FIX 2: freq 欄位在 normalize 後統一為字串
         const matchFreq = filterFreq === '全部' || l.freq === filterFreq
         const matchPaid = isPaid || !l.isPaid
         return matchCat && matchFreq && matchPaid
@@ -141,7 +127,6 @@ export default function PracticeModeSection({ isPaid }) {
   }
 
   const handleReview = () => {
-    // FIX 14: deck[current] 已是 normalize 後的文章，存入錯題本欄位完整
     addToWrongBook(deck[current])
     setResults(r => ({ ...r, review: r.review + 1 }))
     setReviewList(prev => [...prev, deck[current]])
@@ -154,7 +139,6 @@ export default function PracticeModeSection({ isPaid }) {
     else setCurrent(c => c + 1)
   }
 
-  // FIX 2: poolSize 計算用 normalize 後的 freq 欄位
   const poolSize = ALL_ARTICLES.filter(l => {
     const matchCat  = filterCat === '全部' || l.catCode === filterCat
     const matchFreq = filterFreq === '全部' || l.freq === filterFreq
@@ -165,7 +149,6 @@ export default function PracticeModeSection({ isPaid }) {
   // ── 首頁 ──
   if (view === 'home') return (
     <div style={{ maxWidth: '720px', margin: '0 auto' }}>
-      {/* 頂部按鈕列 */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
         <div style={{ flex: 1, background: 'linear-gradient(135deg, #0f1f3d, #1a3a6e)', borderRadius: '14px', padding: '20px', color: 'white', textAlign: 'center', cursor: 'pointer' }}
           onClick={() => setView('home')}>
@@ -190,7 +173,6 @@ export default function PracticeModeSection({ isPaid }) {
         </div>
       </div>
 
-      {/* 設定區 */}
       <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '24px', marginBottom: '16px' }}>
         <h3 style={{ fontWeight: 800, color: '#0f1f3d', marginBottom: '20px', fontSize: '15px' }}>🎯 閃卡練習設定</h3>
 
@@ -290,26 +272,20 @@ export default function PracticeModeSection({ isPaid }) {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {/* FIX 15: 移除單筆 — removeFromWrongBook(l.id) 已可正常運作 */}
             {[...wrongBook].sort((a, b) => b.addedAt - a.addedAt).map(l => (
               <div key={l.id} style={{ background: 'white', borderRadius: '10px', border: '1px solid #fecaca', borderLeft: '4px solid #dc2626', overflow: 'hidden' }}>
                 <div style={{ padding: '14px 18px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
                   <div style={{ flex: 1, cursor: 'pointer' }}
                     onClick={() => setExpandedWrong(expandedWrong === l.id ? null : l.id)}>
                     <div style={{ display: 'flex', gap: '6px', marginBottom: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-                      <span style={{ background: '#0f1f3d', color: 'white', fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
-                        {l.catCode}
-                      </span>
-                      <span style={{ background: '#fef2f2', color: '#dc2626', fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
-                        📕 錯題
-                      </span>
+                      <span style={{ background: '#0f1f3d', color: 'white', fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>{l.catCode}</span>
+                      <span style={{ background: '#fef2f2', color: '#dc2626', fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>📕 錯題</span>
                       <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: 700,
                         background: l.freq === 'high' ? '#fef2f2' : l.freq === 'medium' ? '#fffbeb' : '#f8fafc',
                         color:      l.freq === 'high' ? '#dc2626' : l.freq === 'medium' ? '#d97706' : '#6b7280' }}>
                         {l.freqLabel}
                       </span>
                     </div>
-                    {/* FIX 14+15: code/title 現在來自 normalize，一定有值 */}
                     <div style={{ fontWeight: 800, fontSize: '14px', color: '#0f1f3d' }}>{l.code}</div>
                     <div style={{ fontSize: '13px', color: '#374151', marginTop: '2px' }}>{l.title}</div>
                     {l.subLabel && l.subLabel !== l.title && (
@@ -330,9 +306,7 @@ export default function PracticeModeSection({ isPaid }) {
                 {expandedWrong === l.id && (
                   <div style={{ padding: '0 18px 18px', borderTop: '1px solid #fecaca' }}>
                     <div style={{ marginTop: '14px', background: '#fff8f8', borderRadius: '8px', padding: '14px', fontFamily: 'monospace', fontSize: '13px', lineHeight: 1.9, color: '#1e293b', whiteSpace: 'pre-wrap', borderLeft: '4px solid #dc2626' }}>
-                      {l.isPaid && !isPaid
-                        ? '🔒 此為付費內容，升級後可查看完整條文'
-                        : l.detail}
+                      {l.isPaid && !isPaid ? '🔒 此為付費內容，升級後可查看完整條文' : l.detail}
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
                       <button onClick={() => removeFromWrongBook(l.id)}
@@ -412,7 +386,6 @@ export default function PracticeModeSection({ isPaid }) {
 
   return (
     <div style={{ maxWidth: '640px', margin: '0 auto' }}>
-      {/* 進度條 */}
       <div style={{ marginBottom: '16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#64748b', marginBottom: '6px' }}>
           <span>第 {current + 1} / {deck.length} 題</span>
@@ -423,7 +396,6 @@ export default function PracticeModeSection({ isPaid }) {
         </div>
       </div>
 
-      {/* 法條卡片 */}
       <div style={{
         background: 'white', borderRadius: '16px',
         border: `2px solid ${card.freq === 'high' ? '#fca5a5' : card.freq === 'medium' ? '#fcd34d' : '#e2e8f0'}`,
@@ -444,7 +416,6 @@ export default function PracticeModeSection({ isPaid }) {
               <span style={{ background: '#fef2f2', color: '#dc2626', fontSize: '11px', padding: '3px 10px', borderRadius: '10px', fontWeight: 700 }}>📕 錯題</span>
             )}
           </div>
-          {/* FIX 14: code/title/subLabel 全部來自 normalize，保證有值 */}
           <div style={{ fontSize: '22px', fontWeight: 900, color: '#0f1f3d', marginBottom: '8px' }}>{card.code}</div>
           <div style={{ fontSize: '16px', color: '#374151', fontWeight: 600 }}>{card.title}</div>
           {card.subLabel && card.subLabel !== card.title && (
@@ -470,7 +441,6 @@ export default function PracticeModeSection({ isPaid }) {
         )}
       </div>
 
-      {/* 操作按鈕 */}
       {showAnswer && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
           <button onClick={handleReview}
@@ -484,10 +454,12 @@ export default function PracticeModeSection({ isPaid }) {
         </div>
       )}
 
+      {/* ── FIX 3: 跳過 = 不確定 = 存入錯題本 ── */}
       {!showAnswer && (
-        <button onClick={next}
+        <button
+          onClick={() => { addToWrongBook(deck[current]); next() }}
           style={{ width: '100%', padding: '10px', background: 'none', color: '#94a3b8', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', marginTop: '8px' }}>
-          跳過這題 →
+          🤔 不確定，存入錯題本並跳過 →
         </button>
       )}
     </div>

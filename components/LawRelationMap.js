@@ -122,11 +122,20 @@ const TYPE_CONFIG = {
   info:    { bg: '#f8fafc', border: '#94a3b8', text: '#475569', dot: '#94a3b8', label: '參考' },
 }
 
-export default function LawRelationMap() {
+// FIX: 接收 onCategorySelect prop
+export default function LawRelationMap({ onCategorySelect }) {
   const [selected, setSelected] = useState(null)
   const [filterType, setFilterType] = useState('全部')
+  const [hoveredNode, setHoveredNode] = useState(null)
 
   const scenario = SCENARIOS.find(s => s.id === selected)
+
+  // FIX: 點擊法條節點 → 跳轉到對應分類並搜尋
+  const handleNodeClick = (node) => {
+    if (!onCategorySelect) return
+    // 傳入 cat 篩選 + law 作為搜尋詞，讓 LawSection 定位到該條文
+    onCategorySelect(node.cat, node.law)
+  }
 
   return (
     <div style={{ marginBottom: '16px' }}>
@@ -142,7 +151,7 @@ export default function LawRelationMap() {
       {/* 情境選擇 */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '16px' }}>
         {SCENARIOS.map(s => (
-          <button key={s.id} onClick={() => setSelected(selected === s.id ? null : s.id)}
+          <button key={s.id} onClick={() => { setSelected(selected === s.id ? null : s.id); setFilterType('全部') }}
             style={{ padding: '12px', borderRadius: '10px', border: `2px solid ${selected === s.id ? s.color : '#e2e8f0'}`, cursor: 'pointer', textAlign: 'left',
               background: selected === s.id ? `${s.color}15` : 'white', transition: 'all 0.2s' }}>
             <div style={{ fontSize: '20px', marginBottom: '4px' }}>{s.icon}</div>
@@ -200,22 +209,46 @@ export default function LawRelationMap() {
             })}
           </div>
 
-          {/* 法條節點 */}
+          {/* FIX: 法條節點 — 可點擊，點擊後跳轉到法條列表 */}
+          {onCategorySelect && (
+            <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span>💡</span> 點擊法條可跳轉至對應條文
+            </div>
+          )}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {scenario.nodes
               .filter(n => filterType === '全部' || n.type === filterType)
               .map((node, i) => {
                 const cfg = TYPE_CONFIG[node.type]
+                const isHovered = hoveredNode === `${selected}-${i}`
                 return (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: cfg.bg, border: `1px solid ${cfg.border}`, borderRadius: '8px', padding: '10px 14px' }}>
+                  <div
+                    key={i}
+                    onClick={() => handleNodeClick(node)}
+                    onMouseEnter={() => setHoveredNode(`${selected}-${i}`)}
+                    onMouseLeave={() => setHoveredNode(null)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '12px',
+                      background: isHovered ? cfg.border + '20' : cfg.bg,
+                      border: `1px solid ${isHovered ? cfg.dot : cfg.border}`,
+                      borderRadius: '8px', padding: '10px 14px',
+                      cursor: onCategorySelect ? 'pointer' : 'default',
+                      transition: 'all 0.15s',
+                      transform: isHovered ? 'translateX(3px)' : 'none',
+                    }}>
                     <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: cfg.dot, flexShrink: 0 }} />
                     <div style={{ flex: 1 }}>
                       <span style={{ fontWeight: 800, fontSize: '13px', color: cfg.text }}>{node.law}</span>
                       <span style={{ color: '#374151', fontSize: '13px', marginLeft: '8px' }}>{node.label}</span>
                     </div>
-                    <span style={{ background: '#0f1f3d', color: 'white', fontSize: '10px', padding: '2px 7px', borderRadius: '8px', fontWeight: 700, flexShrink: 0 }}>
-                      {node.cat}類
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                      <span style={{ background: '#0f1f3d', color: 'white', fontSize: '10px', padding: '2px 7px', borderRadius: '8px', fontWeight: 700 }}>
+                        {node.cat}類
+                      </span>
+                      {onCategorySelect && (
+                        <span style={{ fontSize: '12px', color: cfg.dot, opacity: isHovered ? 1 : 0, transition: 'opacity 0.15s' }}>→</span>
+                      )}
+                    </div>
                   </div>
                 )
               })}
