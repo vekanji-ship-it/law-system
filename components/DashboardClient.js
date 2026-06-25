@@ -1,4 +1,5 @@
 'use client'
+import DarkModeToggle from './DarkModeToggle'
 import { FULL_LAW_ARTICLES } from '../lib/full-law-data'
 import { SUPPLEMENT_LAW_ARTICLES_1 } from '../lib/supplement-law-data-1'
 import { SUPPLEMENT_LAW_ARTICLES_2 } from '../lib/supplement-law-data-2'
@@ -20,6 +21,7 @@ import { SUPPLEMENT_LAW_ARTICLES_17 } from '../lib/supplement-law-data-17'
 import { SUPPLEMENT_LAW_ARTICLES_18 } from '../lib/supplement-law-data-18'
 import { SUPPLEMENT_LAW_ARTICLES_19 } from '../lib/supplement-law-data-19'
 import { SUPPLEMENT_LAW_ARTICLES_20 } from '../lib/supplement-law-data-20'
+import { SUPPLEMENT_LAW_ARTICLES_21 } from '../lib/supplement-law-data-21'
 import { useState, useRef, useEffect } from 'react'
 import { createClient } from '../lib/supabase-client'
 import { CASES, EXAM_QUESTIONS, SOPS } from '../lib/data'
@@ -57,6 +59,7 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
     SUPPLEMENT_LAW_ARTICLES_17.length +
     SUPPLEMENT_LAW_ARTICLES_18.length +
     SUPPLEMENT_LAW_ARTICLES_19.length +
+    SUPPLEMENT_LAW_ARTICLES_20.length +
     SUPPLEMENT_LAW_ARTICLES_20.length
 
   // 合併補充資料
@@ -201,6 +204,7 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
             ) : (
               <a href={CHECKOUT_MONTHLY} className="btn btn-gold btn-sm">💳 升級付費版</a>
             )}
+            <DarkModeToggle />  {/* ← 加這行 */}
             <button onClick={handleLogout} className="btn btn-sm" style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)', fontSize: '13px' }}>登出</button>
           </div>
         </div>
