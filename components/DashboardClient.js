@@ -32,12 +32,16 @@ import LawSection from './LawSection'
 import RealCasesSection from './RealCasesSection'
 import ExamAppendixSection from './ExamAppendixSection'
 import PracticeModeSection from './PracticeModeSection'
+// ── FIX: 加入新功能元件 ──
+import CalcPracticeSection from './CalcPracticeSection'
+import MockExamSection from './MockExamSection'
 import Link from 'next/link'
 
 const CHECKOUT_MONTHLY = '/checkout'
 const CHECKOUT_YEARLY = '/checkout'
 
 export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
+  // ── FIX: 修正 totalLaws（原本 SUPPLEMENT_LAW_ARTICLES_20 重複計算了兩次）──
   const totalLaws =
     FULL_LAW_ARTICLES.length +
     SUPPLEMENT_LAW_ARTICLES_1.length +
@@ -51,8 +55,8 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
     SUPPLEMENT_LAW_ARTICLES_9.length +
     SUPPLEMENT_LAW_ARTICLES_10.length +
     SUPPLEMENT_LAW_ARTICLES_11.length +
-    SUPPLEMENT_LAW_ARTICLES_12.length + 
-    SUPPLEMENT_LAW_ARTICLES_13.length + 
+    SUPPLEMENT_LAW_ARTICLES_12.length +
+    SUPPLEMENT_LAW_ARTICLES_13.length +
     SUPPLEMENT_LAW_ARTICLES_14.length +
     SUPPLEMENT_LAW_ARTICLES_15.length +
     SUPPLEMENT_LAW_ARTICLES_16.length +
@@ -60,9 +64,8 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
     SUPPLEMENT_LAW_ARTICLES_18.length +
     SUPPLEMENT_LAW_ARTICLES_19.length +
     SUPPLEMENT_LAW_ARTICLES_20.length +
-    SUPPLEMENT_LAW_ARTICLES_20.length
+    SUPPLEMENT_LAW_ARTICLES_21.length  // ← 原本這行寫成 _20 了
 
-  // 合併補充資料
   const allCases = [...CASES, ...SUPPLEMENT_CASES]
   const allExams = [...EXAM_QUESTIONS, ...SUPPLEMENT_EXAMS]
 
@@ -204,7 +207,7 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
             ) : (
               <a href={CHECKOUT_MONTHLY} className="btn btn-gold btn-sm">💳 升級付費版</a>
             )}
-            <DarkModeToggle />  {/* ← 加這行 */}
+            <DarkModeToggle />
             <button onClick={handleLogout} className="btn btn-sm" style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)', fontSize: '13px' }}>登出</button>
           </div>
         </div>
@@ -249,13 +252,15 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
       </div>
 
       <div className="page-container">
-        {/* 主 Tab 列（5個）*/}
+        {/* ── FIX: 主 Tab 列（7個，新增計算題 + 模擬考）── */}
         <div className="tab-bar">
           {[
             { id: 'cases',    label: '📂 實務案例庫', count: allCases.length + SOPS.length + 19 },
             { id: 'exams',    label: '📝 考古題庫',   count: allExams.length + 38 },
             { id: 'laws',     label: '⚖️ 法條解析',   count: totalLaws },
             { id: 'practice', label: '🎯 練習模式',   count: null },
+            { id: 'calc',     label: '🧮 計算題',     count: null },
+            { id: 'mock',     label: '⏱️ 模擬考',     count: null },
             { id: 'ai',       label: '🤖 AI問答',     count: null },
           ].map(t => (
             <button key={t.id} className={`tab ${tab === t.id ? 'active' : ''}`} onClick={() => setTab(t.id)}
@@ -437,8 +442,11 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
           </div>
         )}
 
-        {tab === 'laws' && <LawSection isPaid={isPaid} />}
+        {tab === 'laws'     && <LawSection isPaid={isPaid} />}
         {tab === 'practice' && <PracticeModeSection isPaid={isPaid} />}
+        {/* ── FIX: 新增計算題 + 模擬考渲染 ── */}
+        {tab === 'calc'     && <CalcPracticeSection />}
+        {tab === 'mock'     && <MockExamSection isPaid={isPaid} />}
 
         {/* ── 🤖 AI 問答 ── */}
         {tab === 'ai' && (
