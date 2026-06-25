@@ -337,8 +337,11 @@ export default function LawSection({ isPaid }) {
           <div style={{ fontSize: '15px', fontWeight: 600, marginBottom: '6px' }}>找不到符合的法條</div>
           {searchText && (
             <div style={{ fontSize: '13px', marginBottom: '16px' }}>
-              關鍵字「<strong style={{ color: '#0f1f3d' }}>{searchText}</strong>」沒有比對到任何結果
-            </div>
+              {searchText
+               ? <>關鍵字「<strong style={{ color: '#0f1f3d' }}>{searchText}</strong>」沒有比對到任何結果</>
+               : <>目前篩選條件下沒有符合的條文，請調整篩選設定</>
+              }
+             </div>
           )}
           <button
             onClick={() => { setSearchText(''); setSelectedCat('全部'); setShowFreq('全部'); setShowExam('全部'); setShowBookmarks(false) }}
