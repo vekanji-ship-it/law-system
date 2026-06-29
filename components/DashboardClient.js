@@ -277,25 +277,31 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
         {/* ── FIX: 主 Tab 列（7個，新增計算題 + 模擬考）── */}
         <div className="tab-bar">
           {[
-            { id: 'cases',    label: '📂 實務案例庫', count: allCases.length + SOPS.length + 19 },
-            { id: 'exams',    label: '📝 考古題庫',   count: allExams.length + 38 },
-            { id: 'laws',     label: '⚖️ 法條解析',   count: totalLaws },
-            { id: 'practice', label: '🎯 練習模式',   count: null },
-            { id: 'calc',     label: '🧮 計算題',     count: null },
-            { id: 'mock',     label: '⏱️ 模擬考',     count: null },
-            { id: 'ai',       label: '🤖 AI問答',     count: null },
+            { id: 'cases',    label: '📂 實務案例庫', count: allCases.length + SOPS.length + 19, paid: true },
+            { id: 'exams',    label: '📝 考古題庫',   count: allExams.length + 38,               paid: true },
+            { id: 'laws',     label: '⚖️ 法條解析',   count: totalLaws,                          paid: false },
+            { id: 'practice', label: '🎯 練習模式',   count: null,                               paid: true },
+            { id: 'calc',     label: '🧮 計算題',     count: null,                               paid: false },
+            { id: 'mock',     label: '⏱️ 模擬考',     count: null,                               paid: true },
+            { id: 'ai',       label: '🤖 AI問答',     count: null,                               paid: true },
           ].map(t => (
             <button key={t.id} className={`tab ${tab === t.id ? 'active' : ''}`} onClick={() => setTab(t.id)}
-              style={t.id === 'ai' ? { position: 'relative' } : {}}>
+              style={{ position: 'relative' }}>
               {t.label}
               {t.count && <span style={{ fontSize: '11px', opacity: 0.6 }}> ({t.count})</span>}
-              {t.id === 'ai' && !isPaid && <span style={{ position: 'absolute', top: '-4px', right: '-4px', background: '#ef4444', color: 'white', fontSize: '9px', borderRadius: '10px', padding: '1px 5px' }}>FREE 3次</span>}
+              {t.paid && !isPaid && (
+                <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: '#f59e0b', color: 'white', fontSize: '9px', borderRadius: '10px', padding: '1px 5px', fontWeight: 700 }}>🔒</span>
+              )}
+              {!t.paid && (
+                <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: '#16a34a', color: 'white', fontSize: '9px', borderRadius: '10px', padding: '1px 5px', fontWeight: 700 }}>免費</span>
+              )}
             </button>
           ))}
         </div>
 
-        {/* ── 📂 實務案例庫（合併） ── */}
-        {tab === 'cases' && (
+        {/* ── 📂 實務案例庫（付費鎖定） ── */}
+        {tab === 'cases' && !isPaid && <LockWall />}
+        {tab === 'cases' && isPaid && (
           <div>
             <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', padding: '12px', background: 'white', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
               <button style={subTabStyle(caseSub === 'cases')} onClick={() => setCaseSub('cases')}>
@@ -398,8 +404,9 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
           </div>
         )}
 
-        {/* ── 📝 考古題庫（合併） ── */}
-        {tab === 'exams' && (
+        {/* ── 📝 考古題庫（付費鎖定） ── */}
+        {tab === 'exams' && !isPaid && <LockWall />}
+        {tab === 'exams' && isPaid && (
           <div>
             <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', padding: '12px', background: 'white', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
               <button style={subTabStyle(examSub === 'exam_questions')} onClick={() => setExamSub('exam_questions')}>
@@ -465,13 +472,15 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
         )}
 
         {tab === 'laws'     && <LawSection isPaid={true} />}
-        {tab === 'practice' && <PracticeModeSection isPaid={isPaid} />}
-        {/* ── FIX: 新增計算題 + 模擬考渲染 ── */}
+        {tab === 'practice' && !isPaid && <LockWall />}
+        {tab === 'practice' && isPaid  && <PracticeModeSection isPaid={isPaid} />}
         {tab === 'calc'     && <CalcPracticeSection />}
-        {tab === 'mock'     && <MockExamSection isPaid={isPaid} />}
+        {tab === 'mock'     && !isPaid && <LockWall />}
+        {tab === 'mock'     && isPaid  && <MockExamSection isPaid={isPaid} />}
 
-        {/* ── 🤖 AI 問答 ── */}
-        {tab === 'ai' && (
+        {/* ── 🤖 AI 問答（付費鎖定） ── */}
+        {tab === 'ai' && !isPaid && <LockWall />}
+        {tab === 'ai' && isPaid && (
           <div style={{ maxWidth: '800px', margin: '0 auto' }}>
             <div style={{ background: 'linear-gradient(135deg, #0f1f3d, #1a3260)', borderRadius: '16px', padding: '24px', marginBottom: '20px', color: 'white', textAlign: 'center' }}>
               <div style={{ fontSize: '40px', marginBottom: '8px' }}>{aiMode === 'quiz' ? '🎓' : '🤖'}</div>
