@@ -29,7 +29,9 @@ import { SUPPLEMENT_LAW_ARTICLES_25 } from '../lib/supplement-law-data-25'
 import { SUPPLEMENT_LAW_ARTICLES_26 } from '../lib/supplement-law-data-26'
 import { SUPPLEMENT_LAW_ARTICLES_27 } from '../lib/supplement-law-data-27'
 import { SUPPLEMENT_LAW_ARTICLES_28 } from '../lib/supplement-law-data-28'
-
+import { SUPPLEMENT_LAW_ARTICLES_29 } from '../lib/supplement-law-data-29'
+import { SUPPLEMENT_LAW_ARTICLES_30 } from '../lib/supplement-law-data-30
+  '
 const EXAM_TYPE_MAP = { '共同': 'both', '地政士': 'land_reg', '經紀人': 'broker' }
 
 const normalizeArticle = (article) => {
@@ -69,6 +71,7 @@ const RAW_ARTICLES = [
   ...SUPPLEMENT_LAW_ARTICLES_23, ...SUPPLEMENT_LAW_ARTICLES_24,
   ...SUPPLEMENT_LAW_ARTICLES_25, ...SUPPLEMENT_LAW_ARTICLES_26,
   ...SUPPLEMENT_LAW_ARTICLES_27, ...SUPPLEMENT_LAW_ARTICLES_28,
+  ...SUPPLEMENT_LAW_ARTICLES_29, ...SUPPLEMENT_LAW_ARTICLES_30,
 ]
 
 const ALL_ARTICLES = RAW_ARTICLES.map(normalizeArticle)
