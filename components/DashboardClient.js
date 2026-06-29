@@ -85,8 +85,8 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
     SUPPLEMENT_LAW_ARTICLES_28.length +
     SUPPLEMENT_LAW_ARTICLES_29.length +
     SUPPLEMENT_LAW_ARTICLES_30.length +
-    SUPPLEMENT_LAW_ARTICLES_30.length +
-    SUPPLEMENT_LAW_ARTICLES_30.length
+    SUPPLEMENT_LAW_ARTICLES_31.length +
+    SUPPLEMENT_LAW_ARTICLES_32.length
   
   const allCases = [...CASES, ...SUPPLEMENT_CASES]
   const allExams = [...EXAM_QUESTIONS, ...SUPPLEMENT_EXAMS]
@@ -198,9 +198,9 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
     <div style={{ background: '#fef9ec', border: '2px dashed #fbbf24', borderRadius: '12px', padding: '32px', textAlign: 'center', marginTop: '12px' }}>
       <div style={{ fontSize: '36px', marginBottom: '12px' }}>🔒</div>
       <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '8px', color: '#0f1f3d' }}>付費會員限定內容</h3>
-      <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '20px' }}>解鎖全部案例、法條、考古題庫、SOP流程和 AI 無限問答</p>
+      <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '20px' }}>解鎖全部案例、考古題庫、練習模式、模擬考和 AI 無限問答</p>
       <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <a href={CHECKOUT_MONTHLY} className="btn btn-gold">💳 NT$799/月 立即訂閱</a>
+        <a href={CHECKOUT_MONTHLY} className="btn btn-gold">💳 NT$699/月 立即訂閱</a>
         <Link href="/activate" className="btn btn-outline">🔑 已有授權碼？點此輸入</Link>
       </div>
     </div>
@@ -238,7 +238,7 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
       {/* 免費版提示 */}
       {!isPaid && (
         <div style={{ background: '#fff8e1', borderBottom: '1px solid #fbbf24', padding: '10px 24px', textAlign: 'center', fontSize: '13px', color: '#92400e' }}>
-          🔑 免費版：<Link href="/activate" style={{ color: '#0f1f3d', fontWeight: 700 }}>輸入授權碼</Link> 或 <a href={CHECKOUT_MONTHLY} style={{ color: '#0f1f3d', fontWeight: 700 }}>升級付費版</a> 解鎖法條 + AI無限問答
+          🎉 法條解析全面免費！<Link href="/activate" style={{ color: '#0f1f3d', fontWeight: 700 }}>輸入授權碼</Link> 或 <a href={CHECKOUT_MONTHLY} style={{ color: '#0f1f3d', fontWeight: 700 }}>升級付費版</a> 解鎖案例庫、考古題、練習模式、模擬考＋AI無限問答
         </div>
       )}
 
@@ -464,7 +464,7 @@ export default function DashboardClient({ user, isPaid, plan, expiresAt }) {
           </div>
         )}
 
-        {tab === 'laws'     && <LawSection isPaid={isPaid} />}
+        {tab === 'laws'     && <LawSection isPaid={true} />}
         {tab === 'practice' && <PracticeModeSection isPaid={isPaid} />}
         {/* ── FIX: 新增計算題 + 模擬考渲染 ── */}
         {tab === 'calc'     && <CalcPracticeSection />}
