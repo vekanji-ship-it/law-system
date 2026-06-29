@@ -26,7 +26,7 @@ export default function HomePage() {
         </h1>
         <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.75)', maxWidth: '560px', margin: '0 auto 40px' }}>
           法條解析、考古題庫、實務案例、SOP流程。
-          一個平台，地政士與房仲業者共用的專業知識庫。
+          1,920+ 法條全面免費，地政士與房仲業者共用的專業知識庫。
         </p>
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link href="/signup" className="btn btn-gold" style={{ fontSize: '16px', padding: '14px 32px' }}>🚀 免費開始使用</Link>
@@ -37,10 +37,10 @@ export default function HomePage() {
       {/* Features */}
       <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 20px 80px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
         {[
-          { icon: '📚', title: '案例庫', desc: '19+ 真實地政案例，繼承、買賣、稅務、租賃，全面覆蓋', free: true },
-          { icon: '📝', title: '考古題庫', desc: '歷年地政士考試題目，含詳解與引用法條', free: false },
-          { icon: '⚖️', title: '法條解析', desc: '重要法條全文 + 白話解說 + 實務應用範例', free: false },
-          { icon: '📋', title: '實務SOP', desc: '買賣、繼承、預告登記等流程的逐步操作手冊', free: false },
+          { icon: '⚖️', title: '法條解析', desc: '1,920+ 法條全文 + 關聯地圖 + 命題分布 + 計算題，全面免費開放', free: true },
+          { icon: '📂', title: '實務案例庫', desc: '真實地政案例，繼承、買賣、稅務、租賃，含SOP流程', free: false },
+          { icon: '📝', title: '考古題庫＋練習', desc: '歷年考試題目、練習模式、模擬考，含詳解與引用法條', free: false },
+          { icon: '🤖', title: 'AI問答顧問', desc: '無限次地政法規AI問答，專業回答土地登記與稅務問題', free: false },
         ].map((f, i) => (
           <div key={i} style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '28px', border: '1px solid rgba(255,255,255,0.12)' }}>
             <div style={{ fontSize: '32px', marginBottom: '12px' }}>{f.icon}</div>
@@ -65,12 +65,12 @@ export default function HomePage() {
           {[
             {
               name: '免費版', price: '0', unit: '永久免費',
-              features: ['基本案例瀏覽（部分）', '3道考古題', '2條法條解析', 'AI問答 3次/天'],
+              features: ['⚖️ 全部法條解析免費', '📊 法條關聯地圖', '📈 命題分布圖', '🧮 計算題練習', 'AI問答 3次/天'],
               cta: '免費註冊', href: '/signup', gold: false, external: false
             },
             {
-              name: '月費版', price: '799', unit: '元 / 月',
-              features: ['全部19+案例', '完整考古題庫', '全法條解析', '所有SOP流程', '🤖 AI問答無限次', '優先客服'],
+              name: '月費版', price: '699', unit: '元 / 月',
+              features: ['📂 全部實務案例庫', '📝 完整考古題庫', '🎯 練習模式＋模擬考', '📋 全SOP流程', '🤖 AI問答無限次', '優先客服'],
               cta: '💳 立即訂閱', href: CHECKOUT_URL, gold: true, external: true
             },
           ].map((p, i) => (
